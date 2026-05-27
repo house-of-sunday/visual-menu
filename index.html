@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>House of Sunday — Visual Menu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#EFE9E3" />
+  <link rel="icon" type="image/png" href="assets/logos/hos-sun-mark-transparent.png" />
+  <link rel="stylesheet" href="colors_and_type.css" />
+
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--hos-salt); color: var(--hos-ink); }
+  body {
+    font-family: var(--font-mono); font-size: 14px;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
+  }
+  img { display: block; max-width: 100%; }
+
+  /* ----- shell ----- */
+  .shell {
+    max-width: 540px; margin: 0 auto;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ----- header ----- */
+  .head {
+    position: sticky; top: 0; z-index: 30;
+    background: var(--hos-salt);
+    padding: 14px 20px 0;
+    padding-top: calc(14px + env(safe-area-inset-top));
+  }
+
+  /* Brand row */
+  .head__brand {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px;
+    padding-bottom: 22px;
+  }
+  .head__brand-icon {
+    width: 48px; height: 48px;
+    display: block;
+  }
+  .head__brand-mark {
+    height: 30px; width: auto; display: block;
+  }
+
+  /* Food / Drinks tabs — primary toggle */
+  .tabs {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--hos-line);
+  }
+  .tab {
+    -webkit-appearance: none; appearance: none;
+    cursor: pointer;
+    font-family: var(--font-serif); font-weight: 400;
+    letter-spacing: -0.015em;
+    font-size: 17px;
+    padding: 12px 0;
+    border-radius: 2px;
+    border: 1px solid var(--hos-ink);
+    background: transparent;
+    color: var(--hos-ink);
+    transition: 140ms ease;
+  }
+  .tab[aria-selected="true"] {
+    background: var(--hos-terracotta);
+    color: var(--hos-cream);
+    border-color: var(--hos-terracotta);
+  }
+
+  /* Section chips — horizontal scroll */
+  .chips {
+    display: flex; gap: 8px;
+    padding: 14px 20px;
+    margin: 0 -20px;                       /* bleed to header edges */
+    overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: none;
+    background: var(--hos-salt);
+    border-bottom: 1px solid var(--hos-line);
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    -webkit-appearance: none; appearance: none;
+    flex: 0 0 auto;
+    cursor: pointer;
+    background: transparent;
+    color: var(--hos-ink);
+    border: 1px solid var(--hos-ink);
+    border-radius: 2px;
+    padding: 7px 14px;
+    font-family: var(--font-serif); font-weight: 400;
+    letter-spacing: -0.005em;
+    font-size: 15px;
+    transition: 120ms ease;
+    white-space: nowrap;
+  }
+  .chip[aria-current="true"] {
+    background: var(--hos-ink);
+    color: var(--hos-salt);
+    border-color: var(--hos-ink);
+  }
+
+  /* ----- grid ----- */
+  .panel { padding: 28px 20px 80px; }
+  .panel[hidden] { display: none; }
+
+  .section + .section { margin-top: 64px; }
+  .section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin: 0 0 18px;
+  }
+  .section-head__title {
+    font-family: var(--font-serif); font-size: 32px; line-height: 1;
+    letter-spacing: -0.015em; color: var(--hos-ink); margin: 0;
+  }
+  .section-head__count {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--hos-ink-soft); letter-spacing: 0.06em;
+  }
+
+  .grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 18px 12px;
+  }
+  .item {
+    display: flex; flex-direction: column; gap: 10px;
+    margin: 0;
+  }
+
+  /* Photo is now its own button — only the photo opens the lightbox. */
+  .item__photo-btn {
+    -webkit-appearance: none; appearance: none;
+    background: transparent; border: 0; padding: 0; margin: 0;
+    display: block; width: 100%;
+    cursor: pointer;
+    font: inherit; color: inherit; text-align: left;
+    transition: transform 200ms ease;
+  }
+  .item__photo-btn:active { transform: scale(0.985); }
+  .item__photo-btn:focus-visible {
+    outline: 2px solid var(--hos-terracotta);
+    outline-offset: 2px;
+  }
+  .item__photo {
+    aspect-ratio: 4 / 5;
+    background: var(--hos-sand);
+    overflow: hidden;
+    position: relative;
+  }
+  .item__photo img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .item__photo--placeholder {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--hos-sand);
+  }
+  .item__photo--placeholder svg {
+    width: 28%; height: 28%; color: var(--hos-terracotta); opacity: 0.45;
+  }
+  .item__name {
+    font-family: var(--font-sans); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: 11.5px; line-height: 1.3; color: var(--hos-ink);
+    margin: 0;
+    /* Reserve two lines so the Ingredients pill below aligns across rows.
+       2 × line-height (1.3em) = 2.6em. min- not fixed, so 3+ line names
+       (none today, but future-proof) still grow naturally. */
+    min-height: 2.6em;
+  }
+
+  /* Native <details> ingredients collapse */
+  .item__details { margin: 0; }
+  /* Belt-and-braces: make sure the description stays hidden when collapsed,
+     even in browsers whose UA stylesheet for <details> is non-standard. */
+  .item__details:not([open]) > :not(summary) { display: none; }
+  .item__toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    align-self: flex-start;
+    padding: 4px 10px;
+    background: transparent;
+    color: var(--hos-ink);
+    border: 1px solid var(--hos-ink);
+    border-radius: 2px;
+    font-family: var(--font-serif); font-weight: 400;
+    letter-spacing: -0.005em;
+    font-size: 13px; line-height: 1.1;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;                /* hide default disclosure triangle */
+    transition: background 140ms ease, color 140ms ease;
+  }
+  .item__toggle::-webkit-details-marker { display: none; }
+  .item__toggle::marker { content: ''; }
+  .item__toggle:focus-visible {
+    outline: 2px solid var(--hos-terracotta);
+    outline-offset: 2px;
+  }
+  .item__chevron {
+    display: inline-block; line-height: 1;
+    transform: rotate(0deg);
+    transition: transform 180ms ease;
+  }
+  .item__details[open] .item__toggle {
+    background: var(--hos-ink);
+    color: var(--hos-salt);
+  }
+  .item__details[open] .item__chevron {
+    transform: rotate(180deg);
+  }
+  .item__desc {
+    font-family: var(--font-mono); font-size: 11px; line-height: 1.5;
+    color: var(--hos-ink-soft);
+    margin: 8px 0 0;
+  }
+  .item__tag {
+    font-family: var(--font-script); font-size: 22px;
+    color: var(--hos-terracotta); line-height: 1; margin-top: 4px;
+  }
+
+  /* ----- lightbox ----- */
+  /* Flex column so the header sits directly above the centered photo
+     as one tight unit, instead of floating at the viewport edge. */
+  .lb {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0, 0, 0, 0.6);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  .lb.is-open { display: flex; }
+
+  .lb__img {
+    display: block;
+    max-width: 90vw;
+    /* Leaves room above for the ~44px header row + the 8px gap */
+    max-height: calc(85vh - 52px);
+    width: auto; height: auto;
+    object-fit: contain;
+  }
+
+  /* Header row sits right above the photo. width matches the photo's
+     max-width so name and × land at the photo's left/right edges.
+     pointer-events: none lets taps on empty space in the row pass
+     through to the scrim (which closes the lightbox); the name and
+     button re-enable their own pointer events. */
+  .lb__header {
+    width: 90vw;
+    max-width: 90vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 4px;
+    pointer-events: none;
+  }
+
+  /* Dish name — matches .item__name typography exactly (Satoshi caps),
+     in Salt so it reads against any photo, with a subtle dark shadow. */
+  .lb__name {
+    font-family: var(--font-sans); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: 11.5px; line-height: 1.3;
+    color: var(--hos-salt);
+    margin: 0;
+    /* Leave room for the 44px close button + padding on the right */
+    max-width: calc(100% - 60px);
+    pointer-events: auto;
+  }
+
+  /* Minimal close button pinned to the viewport top-right —
+     independent of where the dish-name header sits. */
+  .lb__close {
+    position: absolute;
+    top: calc(env(safe-area-inset-top) + 8px);
+    right: calc(env(safe-area-inset-right) + 8px);
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent;
+    color: var(--hos-salt);
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 32px; font-weight: 300; line-height: 1;
+    padding: 0;
+    z-index: 2;
+    transition: opacity 120ms ease, transform 80ms ease;
+  }
+  .lb__close:hover  { opacity: 0.75; }
+  .lb__close:active { transform: scale(0.92); }
+  .lb__close:focus-visible {
+    outline: 2px solid var(--hos-salt);
+    outline-offset: 2px;
+  }
+
+  /* Description + tag remain hidden in the lightbox view. */
+  .lb__body { display: none; }
+
+  /* ----- footer ----- */
+  .foot {
+    text-align: center; padding: 40px 20px 60px;
+    border-top: 1px solid var(--hos-line);
+    margin-top: 20px;
+  }
+  .foot__script {
+    font-family: var(--font-script);
+    color: var(--hos-terracotta);
+    font-size: 24px; line-height: 1.1;
+  }
+  .foot__meta {
+    margin-top: 12px;
+    font-family: var(--font-mono); font-size: 8px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--hos-ink-soft);
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============= HEADER ============= -->
+  <header class="head">
+    <!-- Brand row -->
+    <div class="head__brand">
+      <img class="head__brand-icon" src="assets/logos/HOS-icon.svg" alt="" aria-hidden="true" />
+      <img class="head__brand-mark" src="assets/logos/HOS-Logo-horizontal.svg" alt="House of Sunday" />
+    </div>
+
+    <!-- Food / Drinks tabs -->
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true"  data-tab="food">Food</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="drinks">Drinks</button>
+    </div>
+
+    <!-- Section chips -->
+    <nav class="chips" id="chips" aria-label="Sections"></nav>
+  </header>
+
+  <!-- ============= PANELS ============= -->
+  <main>
+    <section class="panel" id="panel-food" role="tabpanel"></section>
+    <section class="panel" id="panel-drinks" role="tabpanel" hidden></section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot__script">Sundays are better than others.</div>
+    <div class="foot__meta">House of Sunday · Made slowly in Canggu</div>
+  </footer>
+</div>
+
+<!-- ============= LIGHTBOX ============= -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="lbName" tabindex="-1">
+  <button class="lb__close" id="lbClose" type="button" aria-label="Close image">&times;</button>
+  <div class="lb__header">
+    <h3 class="lb__name" id="lbName"></h3>
+  </div>
+  <img class="lb__img" id="lbImg" alt="" />
+  <div class="lb__body" id="lbBody">
+    <p class="lb__desc" id="lbDesc"></p>
+    <div class="lb__tag" id="lbTag" hidden></div>
+  </div>
+</div>
+
+<script src="visual-menu.js"></script>
+</body>
+</html>

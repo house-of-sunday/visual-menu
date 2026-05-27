@@ -1,0 +1,296 @@
+/* ============================================================
+   House of Sunday — Colors & Type
+   ------------------------------------------------------------
+   Warm. Slow. Intentional. Confident but humble.
+   Real food, specialty coffee, art & community.
+   ============================================================ */
+
+/* ---------- FONT FACES ---------- */
+@font-face {
+  font-family: "Amanda Std";
+  src: url("fonts/AmandaStd-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Necto Mono";
+  src: url("fonts/NectoMono-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("fonts/Satoshi-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("fonts/Satoshi-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("fonts/Satoshi-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "My Handwriting";
+  src: url("fonts/My_handwriting.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cactus Jack";
+  src: url("fonts/CactusJack-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cactus Jack";
+  src: url("fonts/CactusJack-Alternate.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic; /* use 'italic' as the swap to access alternate glyphs */
+  font-display: swap;
+}
+@font-face {
+  font-family: "Florsn29";
+  src: url("fonts/Florsn29-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ============================================================
+     COLOR SYSTEM
+     ============================================================ */
+
+  /* — Core brand —
+     The official 9-color palette.
+     Sand is the warm tan; Salt is the cool off-white page background;
+     Sun terracotta is the brand red; Ink is the warm near-black.
+     Supporting tokens (clay-deep, bone, stone, amber-glow) extend
+     these for dark interiors / editorial layouts. */
+  --hos-terracotta:     #B7312C;   /* Sun — the brand red. Sparingly. */
+  --hos-terracotta-deep:#8E2018;   /* hover / pressed states */
+  --hos-terracotta-soft:#D86A56;   /* warm decorative tint */
+
+  --hos-clay-deep:      #4D1A0E;   /* the cafe walls; deep moody backdrop */
+  --hos-clay-mid:       #6E2715;   /* a half-step lighter; section blocks */
+  --hos-wood:           #3A291F;   /* dark wood; tabletops; deep ink alternate */
+
+  --hos-sand:           #D5C6B2;   /* Sand — warm tan; card backgrounds, primary button fill */
+  --hos-sand-warm:      #C3B098;   /* sand with afternoon light — menus */
+  --hos-sand-deep:      #BFAE93;   /* Sand-deep — stepper button borders, dividers */
+  --hos-stone:          #E4DEC8;   /* travertine / limestone tabletop */
+  --hos-bone:           #F2EDE3;   /* lighter alt background */
+  --hos-salt:           #EFE9E3;   /* Salt — cool off-white; canonical page background, selected-card bg */
+  --hos-cream:          #FAF6EE;   /* Cream — lighter cream */
+  --hos-paper:          #FFFFFF;   /* pure white, used for menus */
+
+  --hos-ink:            #1C1815;   /* Ink — warm near-black; main text */
+  --hos-ink-soft:       #3A3A3A;   /* Ink-soft — muted dark grey */
+  --hos-ink-muted:      #8A8A8A;   /* tertiary / disabled / strike */
+  --hos-line:           rgba(17,17,17,0.16);   /* near-black at 16% — thin dividers */
+  --hos-amber-glow:     #F0B070;   /* pendant-light glow; accent for dark UIs */
+
+  /* Sage — the muted green; selected-state borders, toggles */
+  --hos-sage:           #B0AE8E;
+
+  /* — Pastel companions — muted earth tones, drawn from the interior
+     palette: cane, brick, butter. Used sparingly. */
+  --hos-pastel-peach:   #F2C9B4;
+  --hos-pastel-butter:  #ECD9A4;
+  --hos-pastel-sage:    var(--hos-sage);   /* alias — same color */
+  --hos-pastel-cane:    #C9A878;   /* rattan, woven cane */
+  --hos-pastel-rose:    #E6B7A8;
+
+  /* — Semantic — kept simple, warm-leaning */
+  --hos-fg:             var(--hos-ink);
+  --hos-fg-soft:        var(--hos-ink-soft);
+  --hos-fg-muted:       var(--hos-ink-muted);
+  --hos-bg:             var(--hos-sand);
+  --hos-bg-alt:         var(--hos-bone);
+  --hos-bg-elevated:    var(--hos-cream);
+  --hos-accent:         var(--hos-terracotta);
+  --hos-accent-deep:    var(--hos-terracotta-deep);
+  --hos-border:         var(--hos-line);
+
+  /* — Status — minimal; use sparingly */
+  --hos-success:        #4B6B3C;
+  --hos-warning:        #B68D3A;
+  --hos-error:          #B92D26;
+
+  /* ============================================================
+     TYPOGRAPHY
+     ------------------------------------------------------------
+     Four voices, each with a clear job:
+       • Amanda Std   — soft serif headers, category labels
+                        (Coffee, Breakfast, Dinner, Mains, Sweets)
+       • Cactus Jack  — handwritten brush, used for warmth &
+                        signature moments (Sunday Specials, hearts,
+                        margin notes, the wordmark itself)
+       • Satoshi      — bold caps for item names, vertical labels,
+                        UI elements that need authority
+       • Necto Mono   — body, descriptions, prices. Slows the eye
+                        down. Gives the menu its newspaper feel.
+     ============================================================ */
+
+  --font-serif:    "Amanda Std", "Cormorant Garamond", "Cormorant", Georgia, serif;
+  --font-script:   "Cactus Jack", "Caveat", "Patrick Hand", cursive;
+  --font-hand:     "My Handwriting", "Cactus Jack", "Caveat", cursive;
+  --font-sans:     "Satoshi", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono:     "Necto Mono", "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  --font-display:  "Florsn29", "Times New Roman", "Amanda Std", serif; /* alt display, packaging */
+
+  /* — Scale (modular, generous) — */
+  --fs-12: 0.75rem;    /* 12px — micro caps, footnotes */
+  --fs-13: 0.8125rem;  /* 13px — small mono body */
+  --fs-14: 0.875rem;   /* 14px — menu body, item labels */
+  --fs-16: 1rem;       /* 16px — base body */
+  --fs-18: 1.125rem;   /* 18px — lead paragraph */
+  --fs-20: 1.25rem;    /* 20px — large body */
+  --fs-24: 1.5rem;     /* 24px — small heading */
+  --fs-32: 2rem;       /* 32px — section header (serif) */
+  --fs-44: 2.75rem;    /* 44px — display heading */
+  --fs-64: 4rem;       /* 64px — hero */
+  --fs-96: 6rem;       /* 96px — wordmark */
+
+  /* — Line-heights — */
+  --lh-tight:    1.05;
+  --lh-snug:     1.2;
+  --lh-normal:   1.4;
+  --lh-relaxed:  1.55;
+  --lh-loose:    1.7;
+
+  /* — Tracking — */
+  --tr-tight:    -0.01em;
+  --tr-normal:    0em;
+  --tr-wide:      0.02em;
+  --tr-caps:      0.08em;   /* Satoshi caps */
+  --tr-caps-loose:0.12em;   /* vertical category labels */
+
+  /* ============================================================
+     SHAPE, SHADOW, SPACE
+     ============================================================ */
+
+  --radius-xs:  2px;
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  14px;
+  --radius-xl:  22px;
+  --radius-pill:999px;
+
+  --shadow-1: 0 1px 2px rgba(17,17,17,0.06);
+  --shadow-2: 0 4px 14px rgba(17,17,17,0.08);
+  --shadow-3: 0 18px 48px -12px rgba(60,30,15,0.18);
+
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+  --space-10:128px;
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES
+   ============================================================ */
+
+html, body {
+  background: var(--hos-bg);
+  color: var(--hos-fg);
+  font-family: var(--font-mono);
+  font-size: var(--fs-14);
+  line-height: var(--lh-relaxed);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Serif category header — like "Coffee", "Breakfast" */
+.hos-h-serif,
+h1.hos-serif, h2.hos-serif, h3.hos-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: var(--tr-tight);
+  line-height: var(--lh-snug);
+  color: var(--hos-ink);
+}
+
+h1 { font-family: var(--font-serif); font-weight: 400; font-size: var(--fs-64); line-height: var(--lh-tight); letter-spacing: var(--tr-tight); color: var(--hos-ink); margin: 0; }
+h2 { font-family: var(--font-serif); font-weight: 400; font-size: var(--fs-44); line-height: var(--lh-snug); letter-spacing: var(--tr-tight); color: var(--hos-ink); margin: 0; }
+h3 { font-family: var(--font-serif); font-weight: 400; font-size: var(--fs-32); line-height: var(--lh-snug); color: var(--hos-ink); margin: 0; }
+h4 { font-family: var(--font-serif); font-weight: 400; font-size: var(--fs-24); color: var(--hos-ink); margin: 0; }
+
+/* Script — handwritten warmth */
+.hos-script {
+  font-family: var(--font-script);
+  font-weight: 400;
+  letter-spacing: var(--tr-normal);
+  line-height: var(--lh-snug);
+}
+
+/* Caps sans — item names, vertical labels */
+.hos-caps,
+.hos-label {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tr-caps);
+  font-size: var(--fs-14);
+  color: var(--hos-ink);
+}
+.hos-caps--xl {
+  font-size: var(--fs-44);
+  letter-spacing: var(--tr-caps-loose);
+}
+
+/* Mono body — menu descriptions, prices */
+p, .hos-body {
+  font-family: var(--font-mono);
+  font-size: var(--fs-14);
+  line-height: var(--lh-relaxed);
+  color: var(--hos-ink);
+  margin: 0;
+}
+.hos-body--soft { color: var(--hos-fg-soft); }
+.hos-body--muted { color: var(--hos-fg-muted); }
+
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: opacity 120ms ease;
+}
+a:hover { opacity: 0.65; }
+
+::selection {
+  background: var(--hos-terracotta);
+  color: var(--hos-cream);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--hos-line);
+  margin: var(--space-5) 0;
+}
