@@ -63,7 +63,7 @@
   font-display: swap;
 }
 @font-face {
-  font-family: "Florsn29";
+  font-family: "Florencesans SC";
   src: url("fonts/Florsn29-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -151,7 +151,7 @@
   --font-hand:     "My Handwriting", "Cactus Jack", "Caveat", cursive;
   --font-sans:     "Satoshi", "Inter", system-ui, -apple-system, sans-serif;
   --font-mono:     "Necto Mono", "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-  --font-display:  "Florsn29", "Times New Roman", "Amanda Std", serif; /* alt display, packaging */
+  --font-display:  "Florencesans SC", "Times New Roman", "Amanda Std", serif; /* alt display, packaging */
 
   /* — Scale (modular, generous) — */
   --fs-12: 0.75rem;    /* 12px — micro caps, footnotes */
