@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <title>House of Sunday — Visual Menu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#EFE9E3" />
+  <meta name="theme-color" content="#D5C6B2" />
   <link rel="icon" type="image/png" href="assets/logos/hos-sun-mark-transparent.png" />
   <link rel="stylesheet" href="colors_and_type.css" />
 
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; background: var(--hos-salt); color: var(--hos-ink); }
+  html, body { margin: 0; padding: 0; background: var(--hos-sand); color: var(--hos-ink); }
   body {
     font-family: var(--font-mono); font-size: 14px;
     -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
@@ -27,7 +27,7 @@
   /* ----- header ----- */
   .head {
     position: sticky; top: 0; z-index: 30;
-    background: var(--hos-salt);
+    background: var(--hos-sand);
     padding: 14px 20px 0;
     padding-top: calc(14px + env(safe-area-inset-top));
   }
@@ -38,13 +38,13 @@
     padding-bottom: 22px;
   }
   .head__brand-mark {
-    width: min(360px, 90vw);
+    width: min(275px, 90vw);
     height: auto;
     display: block;
   }
   @media (min-width: 600px) {
     .head__brand-mark {
-      width: min(450px, 80vw);
+      width: min(344px, 80vw);
     }
   }
 
@@ -59,7 +59,9 @@
     -webkit-appearance: none; appearance: none;
     cursor: pointer;
     font-family: "Florencesans SC", var(--font-serif); font-weight: 400;
-    letter-spacing: -0.015em;
+    /* Florencesans always renders uppercase, regardless of the HTML casing. */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     font-size: 17px;
     padding: 12px 0;
     border-radius: 2px;
@@ -69,9 +71,9 @@
     transition: 140ms ease;
   }
   .tab[aria-selected="true"] {
-    background: var(--hos-terracotta);
-    color: var(--hos-cream);
-    border-color: var(--hos-terracotta);
+    background: var(--hos-sun);
+    color: var(--hos-salt);
+    border-color: var(--hos-sun);
   }
 
   /* Section chips — horizontal scroll */
@@ -81,7 +83,7 @@
     margin: 0 -20px;                       /* bleed to header edges */
     overflow-x: auto; overflow-y: hidden;
     scrollbar-width: none;
-    background: var(--hos-salt);
+    background: transparent;             /* strip sits on the Sand page; no distinct fill */
     border-bottom: 1px solid var(--hos-line);
   }
   .chips::-webkit-scrollbar { display: none; }
@@ -121,7 +123,7 @@
   }
   .section-head__count {
     font-family: var(--font-mono); font-size: 11px;
-    color: var(--hos-ink-soft); letter-spacing: 0.06em;
+    color: var(--hos-ink); letter-spacing: 0.06em;
   }
 
   .grid {
@@ -144,7 +146,7 @@
   }
   .item__photo-btn:active { transform: scale(0.985); }
   .item__photo-btn:focus-visible {
-    outline: 2px solid var(--hos-terracotta);
+    outline: 2px solid var(--hos-sun);
     outline-offset: 2px;
   }
   .item__photo {
@@ -161,7 +163,7 @@
     background: var(--hos-sand);
   }
   .item__photo--placeholder svg {
-    width: 28%; height: 28%; color: var(--hos-terracotta); opacity: 0.45;
+    width: 28%; height: 28%; color: var(--hos-sun); opacity: 0.45;
   }
   .item__name {
     font-family: var(--font-sans); font-weight: 700;
@@ -198,7 +200,7 @@
   .item__toggle::-webkit-details-marker { display: none; }
   .item__toggle::marker { content: ''; }
   .item__toggle:focus-visible {
-    outline: 2px solid var(--hos-terracotta);
+    outline: 2px solid var(--hos-sun);
     outline-offset: 2px;
   }
   .item__chevron {
@@ -215,12 +217,12 @@
   }
   .item__desc {
     font-family: var(--font-mono); font-size: 11px; line-height: 1.5;
-    color: var(--hos-ink-soft);
+    color: var(--hos-ink);
     margin: 8px 0 0;
   }
   .item__tag {
     font-family: var(--font-script); font-size: 22px;
-    color: var(--hos-terracotta); line-height: 1; margin-top: 4px;
+    color: var(--hos-sun); line-height: 1; margin-top: 4px;
   }
 
   /* ----- lightbox ----- */
@@ -314,14 +316,14 @@
   }
   .foot__script {
     font-family: var(--font-script);
-    color: var(--hos-terracotta);
+    color: var(--hos-sun);
     font-size: 24px; line-height: 1.1;
   }
   .foot__meta {
     margin-top: 12px;
     font-family: var(--font-mono); font-size: 8px;
     letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--hos-ink-soft);
+    color: var(--hos-ink);
     white-space: nowrap;
   }
 </style>

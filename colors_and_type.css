@@ -75,31 +75,22 @@
      COLOR SYSTEM
      ============================================================ */
 
-  /* — Core brand —
-     The official 9-color palette.
-     Sand is the warm tan; Salt is the cool off-white page background;
-     Sun terracotta is the brand red; Ink is the warm near-black.
-     Supporting tokens (clay-deep, bone, stone, amber-glow) extend
-     these for dark interiors / editorial layouts. */
-  --hos-terracotta:     #B7312C;   /* Sun — the brand red. Sparingly. */
-  --hos-terracotta-deep:#8E2018;   /* hover / pressed states */
-  --hos-terracotta-soft:#D86A56;   /* warm decorative tint */
-
-  --hos-clay-deep:      #4D1A0E;   /* the cafe walls; deep moody backdrop */
-  --hos-clay-mid:       #6E2715;   /* a half-step lighter; section blocks */
-  --hos-wood:           #3A291F;   /* dark wood; tabletops; deep ink alternate */
+  /* — Core brand — the single source of truth.
+     Salt — cool off-white. Sand — warm tan (page background).
+     Sun  — the brand red.  Ink  — near-black (text & UI).
+     The supporting neutrals/pastels below extend these for
+     editorial layouts; the four brand colors above are canonical. */
+  --hos-sun:            #B7312C;   /* Sun — the brand red. Single source of truth. */
 
   --hos-sand:           #D5C6B2;   /* Sand — warm tan; card backgrounds, primary button fill */
   --hos-sand-warm:      #C3B098;   /* sand with afternoon light — menus */
   --hos-sand-deep:      #BFAE93;   /* Sand-deep — stepper button borders, dividers */
   --hos-stone:          #E4DEC8;   /* travertine / limestone tabletop */
   --hos-bone:           #F2EDE3;   /* lighter alt background */
-  --hos-salt:           #EFE9E3;   /* Salt — cool off-white; canonical page background, selected-card bg */
-  --hos-cream:          #FAF6EE;   /* Cream — lighter cream */
+  --hos-salt:           #EFE9E3;   /* Salt — cool off-white; canonical page background, on-dark text */
   --hos-paper:          #FFFFFF;   /* pure white, used for menus */
 
-  --hos-ink:            #1C1815;   /* Ink — warm near-black; main text */
-  --hos-ink-soft:       #3A3A3A;   /* Ink-soft — muted dark grey */
+  --hos-ink:            #121212;   /* Ink — near-black; main text. Single source of truth. */
   --hos-ink-muted:      #8A8A8A;   /* tertiary / disabled / strike */
   --hos-line:           rgba(17,17,17,0.16);   /* near-black at 16% — thin dividers */
   --hos-amber-glow:     #F0B070;   /* pendant-light glow; accent for dark UIs */
@@ -117,19 +108,18 @@
 
   /* — Semantic — kept simple, warm-leaning */
   --hos-fg:             var(--hos-ink);
-  --hos-fg-soft:        var(--hos-ink-soft);
+  --hos-fg-soft:        var(--hos-ink);        /* collapsed → Ink (was ink-soft) */
   --hos-fg-muted:       var(--hos-ink-muted);
   --hos-bg:             var(--hos-sand);
   --hos-bg-alt:         var(--hos-bone);
-  --hos-bg-elevated:    var(--hos-cream);
-  --hos-accent:         var(--hos-terracotta);
-  --hos-accent-deep:    var(--hos-terracotta-deep);
+  --hos-bg-elevated:    var(--hos-salt);       /* collapsed → Salt (was cream) */
+  --hos-accent:         var(--hos-sun);
+  --hos-accent-deep:    var(--hos-sun);         /* collapsed → Sun; use opacity/filter for hover */
   --hos-border:         var(--hos-line);
 
   /* — Status — minimal; use sparingly */
   --hos-success:        #4B6B3C;
   --hos-warning:        #B68D3A;
-  --hos-error:          #B92D26;
 
   /* ============================================================
      TYPOGRAPHY
@@ -285,8 +275,8 @@ a {
 a:hover { opacity: 0.65; }
 
 ::selection {
-  background: var(--hos-terracotta);
-  color: var(--hos-cream);
+  background: var(--hos-sun);
+  color: var(--hos-salt);
 }
 
 hr {
