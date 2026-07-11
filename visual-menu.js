@@ -166,8 +166,19 @@ function switchTab(tab) {
 }
 
 // ----- chip auto-highlight on scroll -----
+// The active-section band is derived from the real header height so it always
+// contains the position chip-clicks scroll to (headerH + 8). Hardcoded
+// percentage margins broke when the header grew (language toggle): the click
+// landing ended up below the band on short viewports, so the observer's final
+// event re-highlighted the previous section.
+let scrollSpyObserver = null;
+
 function setupScrollSpy() {
-  const observer = new IntersectionObserver((entries) => {
+  if (scrollSpyObserver) scrollSpyObserver.disconnect();
+  const headerH = Math.round(document.querySelector('.head').getBoundingClientRect().height);
+  const bandHeight = Math.round(window.innerHeight * 0.25);
+  const bottomMargin = Math.max(0, window.innerHeight - headerH - bandHeight);
+  scrollSpyObserver = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
         const id = e.target.id; // section-food-breakfast
@@ -178,10 +189,18 @@ function setupScrollSpy() {
         );
       }
     });
-  }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+  }, { rootMargin: `-${headerH}px 0px -${bottomMargin}px 0px`, threshold: 0 });
 
-  document.querySelectorAll('.section').forEach(s => observer.observe(s));
+  document.querySelectorAll('.section').forEach(s => scrollSpyObserver.observe(s));
 }
+
+// Pixel-based rootMargin doesn't self-adjust like percentages did, so rebuild
+// the observer when the viewport changes (rotation, window resize).
+let scrollSpyResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(scrollSpyResizeTimer);
+  scrollSpyResizeTimer = setTimeout(setupScrollSpy, 200);
+});
 
 // ----- lightbox -----
 let lbReturnFocus = null;
