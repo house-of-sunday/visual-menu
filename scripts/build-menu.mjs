@@ -51,14 +51,27 @@ const QUERY = `*[_type == "visualMenuSection"] | order(displayOrder asc){
 
 const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount}`
 
+// Adding a language = add its code here (and to the schema + front-end LOCALES).
+const LOCALES = ['en', 'zh', 'ru']
+
 // English defaults keep the site building even before the labels singleton
 // exists in the dataset (and double as the en fallback shape).
 const DEFAULT_LABELS = {
-  foodTab: { en: 'Food', zh: null },
-  drinksTab: { en: 'Drinks', zh: null },
-  ingredients: { en: 'Ingredients', zh: null },
-  itemsCount: { en: 'items', zh: null },
+  foodTab: { en: 'Food' },
+  drinksTab: { en: 'Drinks' },
+  ingredients: { en: 'Ingredients' },
+  itemsCount: { en: 'items' },
 }
+
+// {en: ..., zh: ..., ru: ...} with null for missing locales; en falls back
+// to the hardcoded default so the site never renders blank.
+const shapeLocale = (field, fallback = {}) =>
+  Object.fromEntries(
+    LOCALES.map((loc) => [
+      loc,
+      field?.[loc] || (loc === 'en' ? fallback.en || '' : null),
+    ])
+  )
 
 async function main() {
   const [sections, labelsDoc] = await Promise.all([
@@ -66,23 +79,17 @@ async function main() {
     client.fetch(LABELS_QUERY),
   ])
 
-  const shapeLabel = (field, fallback) => ({
-    en: field?.en || fallback.en,
-    zh: field?.zh || null,
-  })
   const labels = Object.fromEntries(
     Object.entries(DEFAULT_LABELS).map(([key, fallback]) => [
       key,
-      shapeLabel(labelsDoc?.[key], fallback),
+      shapeLocale(labelsDoc?.[key], fallback),
     ])
   )
 
   const shapeItem = (item) => ({
-    name: { en: item.name?.en ?? '', zh: item.name?.zh || null },
-    desc: item.description
-      ? { en: item.description.en ?? '', zh: item.description.zh || null }
-      : null,
-    tag: item.tag ? { en: item.tag.en ?? '', zh: item.tag.zh || null } : null,
+    name: shapeLocale(item.name),
+    desc: item.description ? shapeLocale(item.description) : null,
+    tag: item.tag ? shapeLocale(item.tag) : null,
     img: item.image
       ? urlFor(item.image).width(800).fit('max').auto('format').quality(80).url()
       : null,
@@ -90,7 +97,7 @@ async function main() {
 
   const shapeSection = (s) => ({
     key: s.key,
-    title: { en: s.title?.en ?? '', zh: s.title?.zh || null },
+    title: shapeLocale(s.title),
     items: (s.items || []).map(shapeItem),
   })
 

@@ -11,27 +11,40 @@ const MENU = window.MENU_DATA || { food: [], drinks: [] };
 // UI labels (tab names, toggle copy) come from the visualMenuUiLabels
 // singleton via the same generated file; hardcoded English if absent.
 const LABELS = MENU.labels || {
-  foodTab: { en: 'Food', zh: null },
-  drinksTab: { en: 'Drinks', zh: null },
-  ingredients: { en: 'Ingredients', zh: null },
-  itemsCount: { en: 'items', zh: null },
+  foodTab: { en: 'Food' },
+  drinksTab: { en: 'Drinks' },
+  ingredients: { en: 'Ingredients' },
+  itemsCount: { en: 'items' },
 };
 
-let currentLang = localStorage.getItem('hos-lang') === 'zh' ? 'zh' : 'en';
+// Adding a language = add its code here, a pill in index.html, and the
+// locale in the schema + build script.
+const SUPPORTED_LANGS = ['en', 'zh', 'ru'];
 
-// Every localized field falls back to English when the zh translation is
-// still empty (e.g. content just migrated, not yet translated).
+const storedLang = localStorage.getItem('hos-lang');
+let currentLang = SUPPORTED_LANGS.includes(storedLang) ? storedLang : 'en';
+
+// Every localized field falls back to English when the translation for the
+// current language is still empty (e.g. content migrated, not yet translated).
 function pick(field) {
   if (!field) return '';
-  return (currentLang === 'zh' && field.zh) ? field.zh : field.en;
+  return field[currentLang] || field.en;
 }
 
-// "4 items" in English, "4款" in Chinese (measure words attach directly,
-// so no space when the zh label is in use).
+// Count labels: "4 items" (en), "4款" (zh — measure words attach directly,
+// no space), "4 позиции" (ru). A label holding pipe-separated plural forms
+// (e.g. "позиция|позиции|позиций" = one|few|many) is resolved per count via
+// the browser's native plural rules for the current language.
 function itemsCountLabel(n) {
-  const label = pick(LABELS.itemsCount);
-  const zhInUse = currentLang === 'zh' && LABELS.itemsCount.zh;
-  return zhInUse ? `${n}${label}` : `${n} ${label}`;
+  let label = pick(LABELS.itemsCount);
+  if (label.includes('|')) {
+    const forms = label.split('|');
+    const category = new Intl.PluralRules(currentLang).select(n);
+    const index = { one: 0, few: 1, many: 2 }[category];
+    label = forms[index !== undefined ? index : forms.length - 1] || forms[forms.length - 1];
+  }
+  const noSpace = currentLang === 'zh' && LABELS.itemsCount.zh;
+  return noSpace ? `${n}${label}` : `${n} ${label}`;
 }
 
 const SUN_PLACEHOLDER = `
@@ -119,12 +132,17 @@ function renderTabLabels() {
   document.querySelector('[data-tab="drinks"]').textContent = pick(LABELS.drinksTab);
 }
 
+function renderLangButtons() {
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.lang === currentLang))
+  );
+}
+
 function switchLang(lang) {
-  if (lang === currentLang) return;
+  if (lang === currentLang || !SUPPORTED_LANGS.includes(lang)) return;
   currentLang = lang;
   localStorage.setItem('hos-lang', lang);
-  document.getElementById('langEn').setAttribute('aria-pressed', String(lang === 'en'));
-  document.getElementById('langZh').setAttribute('aria-pressed', String(lang === 'zh'));
+  renderLangButtons();
   renderTabLabels();
   renderPanel('food');
   renderPanel('drinks');
@@ -208,10 +226,10 @@ function init() {
   renderChips('food');
 
   // Language toggle reflects whatever was restored from localStorage
-  document.getElementById('langEn').setAttribute('aria-pressed', String(currentLang === 'en'));
-  document.getElementById('langZh').setAttribute('aria-pressed', String(currentLang === 'zh'));
-  document.getElementById('langEn').addEventListener('click', () => switchLang('en'));
-  document.getElementById('langZh').addEventListener('click', () => switchLang('zh'));
+  renderLangButtons();
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.addEventListener('click', () => switchLang(b.dataset.lang));
+  });
 
   // Tabs: swap aria-selected and switch panels
   document.querySelectorAll('.tab').forEach(t => {
