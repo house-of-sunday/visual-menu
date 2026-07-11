@@ -1,0 +1,12 @@
+{
+  "name": "visual-menu",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node scripts/build-menu.mjs"
+  },
+  "dependencies": {
+    "@sanity/client": "^6.24.1",
+    "@sanity/image-url": "^1.1.0"
+  }
+}

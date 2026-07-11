@@ -83,6 +83,31 @@
     border-color: var(--hos-sun);
   }
 
+  /* Language toggle — small pill switch, sits above the Food/Drinks tabs */
+  .lang-toggle {
+    display: flex; justify-content: center;
+    gap: 6px;
+    padding-bottom: 12px;
+  }
+  .lang-btn {
+    -webkit-appearance: none; appearance: none;
+    cursor: pointer;
+    font-family: var(--font-mono); font-weight: 400;
+    letter-spacing: 0.04em;
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--hos-ink);
+    background: transparent;
+    color: var(--hos-ink);
+    transition: 140ms ease;
+  }
+  .lang-btn[aria-pressed="true"] {
+    background: var(--hos-ink);
+    color: var(--hos-salt);
+    border-color: var(--hos-ink);
+  }
+
   /* Section chips — horizontal scroll */
   .chips {
     display: flex; gap: 8px;
@@ -350,6 +375,12 @@
       <img class="head__brand-mark" src="assets/logos/hos-logo-horizontal.svg" alt="House of Sunday" />
     </div>
 
+    <!-- Language toggle -->
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button class="lang-btn" id="langEn" type="button" aria-pressed="true">EN</button>
+      <button class="lang-btn" id="langZh" type="button" aria-pressed="false">中文</button>
+    </div>
+
     <!-- Food / Drinks tabs -->
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" aria-selected="true"  data-tab="food">Food</button>
@@ -385,6 +416,7 @@
   </div>
 </div>
 
+<script src="menu-data.generated.js"></script>
 <script src="visual-menu.js"></script>
 </body>
 </html>

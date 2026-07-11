@@ -1,172 +1,77 @@
 // House of Sunday — Visual Menu data + rendering
+//
+// Menu content is fetched from Sanity at build time (see scripts/build-menu.mjs)
+// and written to menu-data.generated.js as `window.MENU_DATA`, loaded before
+// this file. MENU_DATA shape: { food: [section], drinks: [section] } where
+// section = { key, title: {en, zh}, items: [item] } and
+// item = { name: {en, zh}, desc: {en, zh}|null, tag: {en, zh}|null, img: url|null }.
 
-const MENU = {
-  food: [
-    {
-      key: 'specials', title: 'Specials',
-      items: [
-        { name: 'Beef Comfort Bowl',           img: 'beef-comfort-bowl.jpg',
-          desc: 'Minced beef, basmati rice, pinto beans, kale, fried egg, hand-cut fries, umami sauce' },
-        { name: 'Herb Butter Snapper Bowl',    img: 'herb-butter-snapper-bowl.jpg',
-          desc: 'Red snapper, mashed sweet potato, mixed veggies, aromatic herb butter, orange chimichurri' },
-        { name: 'Beef Scrambled Wrap',         img: 'beef-scrambled-wrap.jpg',
-          desc: 'Minced beef, scrambled eggs, capsicum, caramelized onions, cherry tomatoes, umami sauce' },
-        { name: 'Cheesy Waffle',               img: 'cheesy-waffle.jpg',
-          desc: 'Parmesan cheese waffle, avocado, boiled egg' },
-      ]
-    },
-    {
-      key: 'breakfast', title: 'Breakfast',
-      items: [
-        { name: 'Breakfast Melt Wrap',     img: 'breakfast-melt-wrap.jpg',
-          desc: 'Two scrambled eggs, bacon, mozzarella cheese, pico de gallo, tomato relish' },
-        { name: 'Farm Omelette',           img: 'farm-omelette.jpg',
-          desc: 'Mushroom, spinach, tomato, garlic, tomato relish, smashed avocado' },
-        { name: 'Savory Ricotta Hotcakes', img: 'savory-ricotta-hotcakes.jpg',
-          desc: 'With your choice of egg, crispy bacon, honey' },
-        { name: 'Egg & Bacon Waffle',      img: 'eggs-bacon-waffle.jpg',
-          desc: 'Plantain protein waffle, boiled egg, bacon, sliced avocado' },
-        { name: 'Avocado Almond Toast',    img: 'avocado-almond-toast.jpg',
-          desc: 'Sourdough, poached eggs, avocado, roasted tomato, watercress, arugula vinaigrette, chili flakes, almonds, sesame seeds' },
-        { name: 'Açaí Bowl',               img: 'acai-bowl.jpg',
-          desc: 'Açaí blended with banana, hazelnut granola, mango, coconut flakes' },
-        { name: 'Berry Ricotta Hotcakes',  img: 'berry-ricota-hotcakes.jpg',
-          desc: 'With vanilla whipped cream, berry compote, strawberries, coconut flakes, honey' },
-        { name: 'Strawberry Protein Waffle', img: 'strawberry-protein-waffle.jpg',
-          desc: 'Plantain protein waffle, berry compote, greek yoghurt, strawberries, pistachio crumble, honey' },
-        { name: 'Apple Hazelnut Yoghurt',  img: 'apple-hazelnut-yoghurt.jpg',
-          desc: 'Protein-rich Greek yoghurt, apple, strawberries, tamarillo, hazelnut granola, berry compote' },
-      ]
-    },
-    {
-      key: 'lunch', title: 'Lunch',
-      items: [
-        { name: 'Wagyu Brazilian Lunch',         img: 'brazilian-steak-lunch.jpg',
-          desc: 'Wagyu rump or chicken thigh/breast, basmati rice, pinto beans, farofa, french fries, fried egg' },
-        { name: 'Wagyu Steak Stroganoff',        img: 'steak-crispy-garlic-rice.jpg',
-          desc: 'Wagyu rump or chicken thigh/breast, red stroganoff sauce, mushrooms, rice, shoestring fries' },
-        { name: 'Steak & Crispy Garlic Rice',    img: 'steak-stroganoff.jpg',
-          desc: 'Wagyu rump steak, basmati rice, aromatic herb butter, chives, crispy garlic, umami sauce' },
-        { name: 'Brazilian Curry',               img: 'brazilian-curry.jpg',
-          desc: 'Chicken thigh/breast or red snapper and prawn, coconut curry, basmati rice, farofa' },
-        { name: 'Chicken Rice',                  img: 'chicken-rice.jpg',
-          desc: 'Basmati rice cooked in chicken broth, snowpeas, tomato, mushroom, bacon, chicken thigh' },
-        { name: 'Chicken Sweet Mash',            img: 'chicken-sweet-mash.jpg',
-          desc: 'Chicken thigh, mashed sweet potato, arugula, orange chimichurri, olive oil' },
-        { name: 'Grilled Chicken Wrap',          img: 'chicken-wrap.jpg',
-          desc: 'Chicken thigh/breast, iceberg lettuce, capsicum, cucumber, tomato, pesto sauce' },
-        { name: 'Brazilian Feijoada',            img: 'feijoada.jpg',
-          desc: 'Black bean pork stew, basmati rice, sautéed kale, sourdough farofa, homemade vinaigrette',
-          tag:  'Only on Saturdays' },
-      ]
-    },
-    {
-      key: 'sweets', title: 'Sweets',
-      items: [
-        { name: 'Cheesecake Brûlée',           img: 'cheesecake-brulee.jpg',     desc: 'With pistachio crumble' },
-        { name: 'Flourless Chocolate Cake',    img: 'flourless-chocolate-cake.jpg', desc: 'With vanilla whipped cream' },
-      ]
-    },
-  ],
-  drinks: [
-    {
-      key: 'coffee', title: 'Coffee',
-      items: [
-        { name: 'Black',                       img: 'long-black.jpg' },
-        { name: 'White',                       img: 'capuccinno.jpg' },
-        { name: 'Burnt Caramel Latte',         img: 'burnt-caramel-latte.jpg',
-          desc: 'Burnt caramel, milk, honeycomb, espresso' },
-        { name: 'Toasted Chocolate Mocha',     img: 'toasted-chocolate-mocha.jpg',
-          desc: 'Cacao powder and husk, milk, honey, chocolate rice puff, espresso' },
-        { name: 'Salted Honey Foam Cold Drip', img: 'honey-foam-cold-drip.jpg',
-          desc: 'Salted honey foam, orange zest, nutmeg, cold drip' },
-      ]
-    },
-    {
-      key: 'matcha', title: 'Matcha',
-      items: [
-        { name: 'Ceremonial Matcha Latte',     img: 'ceremonial-matcha-latte.jpg',
-          desc: 'Whisked ceremonial-grade matcha, milk' },
-        { name: 'Strawberry Iced Matcha',      img: 'strawberry-iced-matcha.jpg',
-          desc: 'Matcha, strawberry jam, milk' },
-        { name: 'Matcha Cloud',                img: 'matcha-cloud.jpg',
-          desc: 'Matcha, coconut water, coconut cream' },
-      ]
-    },
-    {
-      key: 'hydrate', title: 'Hydrate',
-      items: [
-        { name: 'Green Hydrate',               img: 'cucumber-cooler.jpg',
-          desc: 'Cucumber, mint, honey, lime, salt' },
-        { name: 'Watermelon Hydrate',          img: 'watermelon-hydrate.jpg',
-          desc: 'Watermelon, honey, lime, salt' },
-        { name: 'Spicy Pineapple Hydrate',     img: 'probiotic-pineapple.jpg',
-          desc: 'Pineapple tepache, coconut, spicy honey, lime, salt' },
-      ]
-    },
-    {
-      key: 'refresh', title: 'Refresh',
-      items: [
-        { name: 'Mate Lemon Ice Tea',          img: 'mate-lemon-ice-tea.jpg',
-          desc: 'Lemon, yerba mate, honey' },
-        { name: 'Nourish Juice',               img: 'nourish-juice.jpg',
-          desc: 'Orange, passionfruit, honey, mint, ginger' },
-        { name: 'Brazilian Limeade',           img: 'brazilian-limeade.jpg',
-          desc: 'Lime juice, lime peel, condensed milk' },
-        { name: 'Fresh Mint Tea',              img: 'fresh-mint-tea.jpg',
-          desc: 'With honey on the side' },
-        { name: 'Fresh Ginger Tea',            img: 'fresh-ginger-tea.jpg',
-          desc: 'With lemon and honey on the side' },
-      ]
-    },
-    {
-      key: 'blend', title: 'Blend',
-      items: [
-        { name: 'Brazilian Açaí & Banana',     img: 'brazilian-acai-banana.jpg',
-          desc: 'Açaí blended with banana' },
-        { name: 'Strength',                    img: 'nutbutter-power.jpg',
-          desc: 'Banana, peanut butter, coconut milk, cinnamon' },
-        { name: 'Recovery Milkshake',          img: 'chocolate-recovery.jpg',
-          desc: 'Cocoa, chia, date, honey, cinnamon, sea salt, milk' },
-      ]
-    },
-  ]
+const MENU = window.MENU_DATA || { food: [], drinks: [] };
+
+// UI labels (tab names, toggle copy) come from the visualMenuUiLabels
+// singleton via the same generated file; hardcoded English if absent.
+const LABELS = MENU.labels || {
+  foodTab: { en: 'Food', zh: null },
+  drinksTab: { en: 'Drinks', zh: null },
+  ingredients: { en: 'Ingredients', zh: null },
+  itemsCount: { en: 'items', zh: null },
 };
+
+let currentLang = localStorage.getItem('hos-lang') === 'zh' ? 'zh' : 'en';
+
+// Every localized field falls back to English when the zh translation is
+// still empty (e.g. content just migrated, not yet translated).
+function pick(field) {
+  if (!field) return '';
+  return (currentLang === 'zh' && field.zh) ? field.zh : field.en;
+}
+
+// "4 items" in English, "4款" in Chinese (measure words attach directly,
+// so no space when the zh label is in use).
+function itemsCountLabel(n) {
+  const label = pick(LABELS.itemsCount);
+  const zhInUse = currentLang === 'zh' && LABELS.itemsCount.zh;
+  return zhInUse ? `${n}${label}` : `${n} ${label}`;
+}
 
 const SUN_PLACEHOLDER = `
   <div class="item__photo item__photo--placeholder">
     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 401.36 687.3"><path d="M342.187,336.698c.615-1.416-.564-2.966-2.092-2.742-41.383,6.065-44.903-7.291-81.427-8.774-.359-.015-.626-.358-.629-.717-.382-44.257,45.927-60.012,43.537-105.015-.397-5.486-3.154-17.374-9.41-19.594-1.246-.442-2.502.601-2.398,1.92,3.768,48.019-53.288,61.903-64.738,104.563-.159.593-.944.735-1.271.215-17.959-28.594,5.581-67.981,2.44-98.709-1.472-13.093-8.119-30.393-20.689-36.576-1.167-.574-2.496.454-2.184,1.717,16.344,66.237-35.406,80.535-22.797,134.385.132.565-.443,1.042-.97.798-31.775-14.751-31.36-27.422-36.926-59.334-3.896-14.246-13.404-42.43-29.206-43.623-1.358-.103-2.302,1.36-1.686,2.575,23.702,46.677-4.591,66.81,34.479,117.283.687.888,1.136,1.647,1.395,2.136.172.326.054.737-.261.928-17.605,10.707-41.156-1.897-60.876,2.354-9.032,1.947-19.251,7.7-24.934,16.212-.357.534-1.496,2.349-2.337,4.115-.722,1.517.79,3.132,2.362,2.539,42.387-15.99,51.901,19.075,92.374,14.223.628-.075,1.032.644.628,1.131-11.375,13.719-21.907,26.635-25.412,44.733-5.926,31.001,1.459,49.125-27.662,69.54-1.935,3.492,6.205,2.168,7.922,1.891,57.216-9.733,40.192-63.731,77.468-90.807.287-.208.701-.165.938.098,33.1,36.691-19.089,97.786,33.014,121.708,1.436.659,2.921-.809,2.332-2.274-21.549-53.633,23.363-75.259,9.948-119.845-.191-.636.512-1.161,1.054-.779,5.171,3.642,10.494,7.451,14.93,11.708,25.85,27.251,16.375,57.985,60.762,76.017,5.659,2.299,5.946.907,3.518-3.401-15.029-26.666-14.658-34.971-24.919-68.928-6.311-20.885-16.279-31.127-30.186-43.165-.35-.303-.315-.875.076-1.122,17.876-11.291,34.764-1.336,56.502-6.593,8.98-2.172,19.251-7.7,24.934-16.212.399-.598,1.778-2.799,2.622-4.741Z"/></svg>
   </div>`;
 
-const itemPhoto = (item) => `
-  <div class="item__photo">
-    <img loading="lazy" src="assets/menu/${item.img}" alt="${item.name}" />
-  </div>`;
+const itemPhoto = (item, name) => item.img
+  ? `<div class="item__photo">
+      <img loading="lazy" src="${item.img}" alt="${name}" />
+    </div>`
+  : SUN_PLACEHOLDER;
 
 const itemCard = (item, sectionKey) => {
-  const safeName = item.name.replace(/"/g, '&quot;');
-  const safeDesc = item.desc ? item.desc.replace(/"/g, '&quot;') : '';
-  const safeTag  = item.tag ? item.tag.replace(/"/g, '&quot;') : '';
+  const name = pick(item.name);
+  const desc = item.desc ? pick(item.desc) : '';
+  const tag  = item.tag ? pick(item.tag) : '';
+  const safeName = name.replace(/"/g, '&quot;');
+  const safeDesc = desc.replace(/"/g, '&quot;');
+  const safeTag  = tag.replace(/"/g, '&quot;');
   return `
   <article class="item" data-section="${sectionKey}">
     <button class="item__photo-btn"
             type="button"
             data-name="${safeName}"
             data-desc="${safeDesc}"
-            data-img="assets/menu/${item.img}"
-            ${item.tag ? `data-tag="${safeTag}"` : ''}
+            ${item.img ? `data-img="${item.img}"` : ''}
+            ${tag ? `data-tag="${safeTag}"` : ''}
             aria-label="Open photo of ${safeName}">
-      ${itemPhoto(item)}
+      ${itemPhoto(item, safeName)}
     </button>
-    <h3 class="item__name">${item.name}</h3>
-    ${item.desc ? `<details class="item__details">
+    <h3 class="item__name">${name}</h3>
+    ${desc ? `<details class="item__details">
       <summary class="item__toggle">
-        <span class="item__toggle-label">Ingredients</span>
+        <span class="item__toggle-label">${pick(LABELS.ingredients)}</span>
         <span class="item__chevron" aria-hidden="true">▾</span>
       </summary>
-      <p class="item__desc">${item.desc}</p>
+      <p class="item__desc">${desc}</p>
     </details>` : ''}
-    ${item.tag ? `<div class="item__tag">${item.tag}</div>` : ''}
+    ${tag ? `<div class="item__tag">${tag}</div>` : ''}
   </article>`;
 };
 
@@ -176,8 +81,8 @@ function renderPanel(type) {
   panel.innerHTML = sections.map(s => `
     <div class="section" id="section-${type}-${s.key}">
       <div class="section-head">
-        <h2 class="section-head__title">${s.title}</h2>
-        <div class="section-head__count">${s.items.length} items</div>
+        <h2 class="section-head__title">${pick(s.title)}</h2>
+        <div class="section-head__count">${itemsCountLabel(s.items.length)}</div>
       </div>
       <div class="grid">${s.items.map(i => itemCard(i, s.key)).join('')}</div>
     </div>
@@ -188,7 +93,7 @@ function renderChips(type) {
   const sections = MENU[type];
   const chipsEl = document.getElementById('chips');
   chipsEl.innerHTML = sections.map((s, i) =>
-    `<button class="chip" data-section="${s.key}" aria-current="${i === 0 ? 'true' : 'false'}">${s.title}</button>`
+    `<button class="chip" data-section="${s.key}" aria-current="${i === 0 ? 'true' : 'false'}">${pick(s.title)}</button>`
   ).join('');
 
   chipsEl.querySelectorAll('.chip').forEach(c => {
@@ -207,6 +112,26 @@ function renderChips(type) {
       window.scrollTo({ top: y, behavior: 'smooth' });
     });
   });
+}
+
+function renderTabLabels() {
+  document.querySelector('[data-tab="food"]').textContent = pick(LABELS.foodTab);
+  document.querySelector('[data-tab="drinks"]').textContent = pick(LABELS.drinksTab);
+}
+
+function switchLang(lang) {
+  if (lang === currentLang) return;
+  currentLang = lang;
+  localStorage.setItem('hos-lang', lang);
+  document.getElementById('langEn').setAttribute('aria-pressed', String(lang === 'en'));
+  document.getElementById('langZh').setAttribute('aria-pressed', String(lang === 'zh'));
+  renderTabLabels();
+  renderPanel('food');
+  renderPanel('drinks');
+  renderChips(currentTab);
+  document.getElementById('panel-food').hidden = currentTab !== 'food';
+  document.getElementById('panel-drinks').hidden = currentTab !== 'drinks';
+  setupScrollSpy();
 }
 
 let currentTab = 'food';
@@ -244,6 +169,7 @@ function setupScrollSpy() {
 let lbReturnFocus = null;
 
 function openLightbox(card) {
+  if (!card.dataset.img) return; // no photo yet — nothing to zoom into
   const lb = document.getElementById('lb');
   document.getElementById('lbImg').src  = card.dataset.img;
   document.getElementById('lbImg').alt  = card.dataset.name;
@@ -276,9 +202,16 @@ function closeLightbox() {
 // ----- init -----
 function init() {
   // Render both panels (we just hide the inactive one)
+  renderTabLabels();
   renderPanel('food');
   renderPanel('drinks');
   renderChips('food');
+
+  // Language toggle reflects whatever was restored from localStorage
+  document.getElementById('langEn').setAttribute('aria-pressed', String(currentLang === 'en'));
+  document.getElementById('langZh').setAttribute('aria-pressed', String(currentLang === 'zh'));
+  document.getElementById('langEn').addEventListener('click', () => switchLang('en'));
+  document.getElementById('langZh').addEventListener('click', () => switchLang('zh'));
 
   // Tabs: swap aria-selected and switch panels
   document.querySelectorAll('.tab').forEach(t => {
