@@ -3,8 +3,9 @@
 // Menu content is fetched from Sanity at build time (see scripts/build-menu.mjs)
 // and written to menu-data.generated.js as `window.MENU_DATA`, loaded before
 // this file. MENU_DATA shape: { food: [section], drinks: [section] } where
-// section = { key, title: {en, zh}, items: [item] } and
-// item = { name: {en, zh}, desc: {en, zh}|null, tag: {en, zh}|null, img: url|null }.
+// section = { key, title: {<locale>: string}, items: [item] } and
+// item = { name, desc, tag: {<locale>: string}|null, img: url|null },
+// with one key per entry in SUPPORTED_LANGS below.
 
 const MENU = window.MENU_DATA || { food: [], drinks: [] };
 
@@ -19,7 +20,7 @@ const LABELS = MENU.labels || {
 
 // Adding a language = add its code here, a pill in index.html, and the
 // locale in the schema + build script.
-const SUPPORTED_LANGS = ['en', 'zh', 'ru'];
+const SUPPORTED_LANGS = ['en', 'zh', 'ru', 'id'];
 
 const storedLang = localStorage.getItem('hos-lang');
 let currentLang = SUPPORTED_LANGS.includes(storedLang) ? storedLang : 'en';
