@@ -142,10 +142,19 @@ function renderLangButtons() {
   );
 }
 
+// Keep the document language in sync with the UI language. This matters most
+// for CJK: zh and ja share Han-unified codepoints, and system fallback fonts
+// pick regional glyph shapes from the document language — with a wrong/static
+// lang, Japanese kanji can render with Chinese-styled glyphs (and vice versa).
+function syncDocumentLang() {
+  document.documentElement.lang = currentLang;
+}
+
 function switchLang(lang) {
   if (lang === currentLang || !SUPPORTED_LANGS.includes(lang)) return;
   currentLang = lang;
   localStorage.setItem('hos-lang', lang);
+  syncDocumentLang();
   renderLangButtons();
   renderTabLabels();
   renderPanel('food');
@@ -249,6 +258,7 @@ function init() {
   renderChips('food');
 
   // Language toggle reflects whatever was restored from localStorage
+  syncDocumentLang();
   renderLangButtons();
   document.querySelectorAll('.lang-btn').forEach(b => {
     b.addEventListener('click', () => switchLang(b.dataset.lang));
