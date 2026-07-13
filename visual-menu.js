@@ -20,10 +20,12 @@ const LABELS = MENU.labels || {
 
 // Adding a language = add its code here, a pill in index.html, and the
 // locale in the schema + build script.
-const SUPPORTED_LANGS = ['en', 'zh', 'ru', 'id', 'ja'];
+const SUPPORTED_LANGS = ['en', 'zh', 'ru', 'id', 'ja', 'ko'];
 
-// CJK counters attach directly to the number (「4款」,「4品」) — no space.
-const NO_SPACE_COUNT_LANGS = ['zh', 'ja'];
+// Counters that attach directly to the number: CJK (「4款」,「4品」) and
+// Korean ("4가지" — 한글 맞춤법 §43 permits attaching counters to Arabic
+// numerals; universal menu convention).
+const NO_SPACE_COUNT_LANGS = ['zh', 'ja', 'ko'];
 
 const storedLang = localStorage.getItem('hos-lang');
 let currentLang = SUPPORTED_LANGS.includes(storedLang) ? storedLang : 'en';
