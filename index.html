@@ -257,6 +257,51 @@
     color: var(--hos-sun); line-height: 1; margin-top: 4px;
   }
 
+  /* ----- CJK legibility ----- */
+  /* zh/ja render in system fallback fonts (the brand fonts have no CJK
+     glyphs) that look thinner and smaller than the Latin faces at the same
+     declared size. Bump the small body copy so it reads as visually
+     equivalent. Scoped via :lang() — the <html> lang attribute follows the
+     language toggle, so en/ru/id are untouched. */
+  :lang(zh) .item__desc,
+  :lang(ja) .item__desc {
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.7;
+  }
+  :lang(zh) .section-head__count,
+  :lang(ja) .section-head__count {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  :lang(zh) .item__toggle,
+  :lang(ja) .item__toggle {
+    font-size: 14px;
+    /* 600, not 500: the system CJK fallback fonts have no medium cut and
+       don't synthesize one — 500 renders identical to 400 (tested). */
+    font-weight: 600;
+  }
+  /* Dish names (card + lightbox): already 700 = real bold in the fallback
+     fonts, so only size needs the CJK bump. min-height on the card name is
+     em-based, so the two-line alignment reserve scales with it. */
+  :lang(zh) .item__name,
+  :lang(ja) .item__name,
+  :lang(zh) .lb__name,
+  :lang(ja) .lb__name {
+    font-size: 13px;
+  }
+  /* Tag ("Only on Saturdays"): the script font has no Cyrillic or CJK
+     glyphs, so zh/ru/ja fall through to plain system fonts — and 22px is
+     sized for the script face's decorative look, reading oversized as plain
+     text. Render it as a small accent label instead. en/id keep the real
+     script font and are untouched. */
+  :lang(zh) .item__tag,
+  :lang(ru) .item__tag,
+  :lang(ja) .item__tag {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
   /* ----- lightbox ----- */
   /* Flex column so the header sits directly above the centered photo
      as one tight unit, instead of floating at the viewport edge. */
