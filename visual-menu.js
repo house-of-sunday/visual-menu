@@ -20,7 +20,10 @@ const LABELS = MENU.labels || {
 
 // Adding a language = add its code here, a pill in index.html, and the
 // locale in the schema + build script.
-const SUPPORTED_LANGS = ['en', 'zh', 'ru', 'id'];
+const SUPPORTED_LANGS = ['en', 'zh', 'ru', 'id', 'ja'];
+
+// CJK counters attach directly to the number (「4款」,「4品」) — no space.
+const NO_SPACE_COUNT_LANGS = ['zh', 'ja'];
 
 const storedLang = localStorage.getItem('hos-lang');
 let currentLang = SUPPORTED_LANGS.includes(storedLang) ? storedLang : 'en';
@@ -44,7 +47,7 @@ function itemsCountLabel(n) {
     const index = { one: 0, few: 1, many: 2 }[category];
     label = forms[index !== undefined ? index : forms.length - 1] || forms[forms.length - 1];
   }
-  const noSpace = currentLang === 'zh' && LABELS.itemsCount.zh;
+  const noSpace = NO_SPACE_COUNT_LANGS.includes(currentLang) && LABELS.itemsCount[currentLang];
   return noSpace ? `${n}${label}` : `${n} ${label}`;
 }
 
