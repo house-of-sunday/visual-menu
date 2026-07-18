@@ -154,8 +154,17 @@ function syncDocumentLang() {
 
 function switchLang(lang) {
   if (lang === currentLang || !SUPPORTED_LANGS.includes(lang)) return;
+  const previousLang = currentLang;
   currentLang = lang;
   localStorage.setItem('hos-lang', lang);
+  if (typeof window !== 'undefined') {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'menu_language_change',
+      language: lang,
+      previous_language: previousLang
+    });
+  }
   syncDocumentLang();
   renderLangButtons();
   renderTabLabels();
