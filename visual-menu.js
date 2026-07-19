@@ -27,8 +27,34 @@ const SUPPORTED_LANGS = ['en', 'zh', 'ru', 'id', 'ja', 'ko'];
 // numerals; universal menu convention).
 const NO_SPACE_COUNT_LANGS = ['zh', 'ja', 'ko'];
 
+// ----- deep-link parameters (?lang= / ?section=) -----
+// Parsed at module load, BEFORE the first render, so a URL-specified language
+// is applied to the very first paint rather than flashing the stored/default
+// language and re-rendering.
+const deepLink = (() => {
+  let params;
+  try {
+    params = new URLSearchParams(window.location.search);
+  } catch {
+    return { lang: null, section: null };
+  }
+  const rawLang = (params.get('lang') || '').trim().toLowerCase();
+  const rawSection = (params.get('section') || '').trim().toLowerCase();
+  return {
+    // Only accept languages we actually ship; anything else is ignored so a
+    // stale or hand-edited link degrades to normal behaviour.
+    lang: SUPPORTED_LANGS.includes(rawLang) ? rawLang : null,
+    section: rawSection || null,
+  };
+})();
+
 const storedLang = localStorage.getItem('hos-lang');
-let currentLang = SUPPORTED_LANGS.includes(storedLang) ? storedLang : 'en';
+// Precedence: ?lang= (this page load only) > stored preference > English.
+// The URL value is deliberately NOT written to localStorage — a marketing or
+// sitelink URL shouldn't permanently overwrite a language the visitor chose
+// for themselves. It applies for this visit; using the toggle still persists.
+let currentLang = deepLink.lang
+  || (SUPPORTED_LANGS.includes(storedLang) ? storedLang : 'en');
 
 // Every localized field falls back to English when the translation for the
 // current language is still empty (e.g. content migrated, not yet translated).
@@ -108,6 +134,15 @@ function renderPanel(type) {
   `).join('');
 }
 
+// Scroll a section clear of the sticky header. Shared by chip clicks and
+// deep-linking so both land identically — a native anchor jump (#id) does NOT
+// account for the sticky header and leaves the heading hidden underneath it.
+function scrollToSection(el, behavior = 'smooth') {
+  const headerH = document.querySelector('.head').getBoundingClientRect().height;
+  const y = el.getBoundingClientRect().top + window.scrollY - headerH - 8;
+  window.scrollTo({ top: y, behavior });
+}
+
 function renderChips(type) {
   const sections = MENU[type];
   const chipsEl = document.getElementById('chips');
@@ -123,12 +158,8 @@ function renderChips(type) {
       );
       c.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
       // Jump to the corresponding section
-      const id = `section-${currentTab}-${c.dataset.section}`;
-      const el = document.getElementById(id);
-      if (!el) return;
-      const headerH = document.querySelector('.head').getBoundingClientRect().height;
-      const y = el.getBoundingClientRect().top + window.scrollY - headerH - 8;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      const el = document.getElementById(`section-${currentTab}-${c.dataset.section}`);
+      if (el) scrollToSection(el, 'smooth');
     });
   });
 }
@@ -187,6 +218,63 @@ function switchTab(tab) {
   document.getElementById('panel-drinks').hidden = tab !== 'drinks';
   renderChips(tab);
   window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+}
+
+// ----- deep-link target resolution -----
+// ?section= accepts either a tab name ("food" / "drinks") or an individual
+// section key ("coffee", "lunch", ...). Section keys are language-independent
+// (they come from Sanity), so a link keeps working in every language.
+// Unknown values resolve to null and are ignored — the page just loads normally.
+function resolveSectionTarget(value) {
+  if (!value) return null;
+  if (value === 'food' || value === 'drinks') return { tab: value, sectionKey: null };
+  for (const tab of ['food', 'drinks']) {
+    if ((MENU[tab] || []).some(s => s.key === value)) return { tab, sectionKey: value };
+  }
+  return null;
+}
+
+// Applied once, at the end of init(), so panels are already rendered and the
+// scroll-spy observer exists. Scrolls instantly rather than smoothly: this is
+// a page load, not a user gesture — a scroll animation on arrival reads as a
+// glitch and can be interrupted by the visitor's own scrolling.
+function applyDeepLinkSection() {
+  const target = resolveSectionTarget(deepLink.section);
+  if (!target) return;
+
+  // Requirement: never try to scroll to a panel the tab system has hidden.
+  if (target.tab !== currentTab) switchTab(target.tab);
+
+  if (!target.sectionKey) return; // tab-level link: switchTab already put us at the top
+
+  let landedAt = null;
+  const scrollToTarget = () => {
+    const el = document.getElementById(`section-${target.tab}-${target.sectionKey}`);
+    if (!el) return;
+    scrollToSection(el, 'auto');
+    landedAt = Math.round(window.scrollY);
+    // Highlight the matching chip immediately rather than waiting for the
+    // observer to catch up after the jump.
+    document.querySelectorAll('#chips .chip').forEach(c =>
+      c.setAttribute('aria-current', String(c.dataset.section === target.sectionKey))
+    );
+  };
+
+  // Scroll synchronously. Panels are rendered by this point, and the photo
+  // boxes reserve their height via CSS aspect-ratio, so layout is already
+  // final — no need to wait.
+  //
+  // Deliberately NOT requestAnimationFrame: rAF does not fire while a page is
+  // hidden (opened in a background tab, or prerendered by the browser), which
+  // would silently break exactly the shared/marketing links this exists for.
+  scrollToTarget();
+
+  // Safety net for late layout shifts (a slow font, an unsized asset) — but
+  // only re-assert if the visitor hasn't scrolled away themselves, so we
+  // never yank the page out from under someone.
+  window.addEventListener('load', () => {
+    if (landedAt !== null && Math.abs(window.scrollY - landedAt) < 4) scrollToTarget();
+  }, { once: true });
 }
 
 // ----- chip auto-highlight on scroll -----
@@ -299,6 +387,9 @@ function init() {
   });
 
   setupScrollSpy();
+
+  // Last: panels are rendered, tabs are wired, the observer is live.
+  applyDeepLinkSection();
 }
 
 if (document.readyState === 'loading') {
