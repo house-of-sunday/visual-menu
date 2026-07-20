@@ -48,13 +48,11 @@ const deepLink = (() => {
   };
 })();
 
-const storedLang = localStorage.getItem('hos-lang');
-// Precedence: ?lang= (this page load only) > stored preference > English.
-// The URL value is deliberately NOT written to localStorage — a marketing or
-// sitelink URL shouldn't permanently overwrite a language the visitor chose
-// for themselves. It applies for this visit; using the toggle still persists.
-let currentLang = deepLink.lang
-  || (SUPPORTED_LANGS.includes(storedLang) ? storedLang : 'en');
+// Precedence: ?lang= > English. Every visit starts in English by design —
+// a language chosen on a previous visit is deliberately not carried over, so
+// the menu presents the same way to everyone arriving fresh. Switching during
+// a session is in-memory only and unaffected.
+let currentLang = deepLink.lang || 'en';
 
 // Every localized field falls back to English when the translation for the
 // current language is still empty (e.g. content migrated, not yet translated).
@@ -187,7 +185,6 @@ function switchLang(lang) {
   if (lang === currentLang || !SUPPORTED_LANGS.includes(lang)) return;
   const previousLang = currentLang;
   currentLang = lang;
-  localStorage.setItem('hos-lang', lang);
   if (typeof window !== 'undefined') {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
@@ -356,7 +353,7 @@ function init() {
   renderPanel('drinks');
   renderChips('food');
 
-  // Language toggle reflects whatever was restored from localStorage
+  // Language toggle reflects the starting language (?lang= or English)
   syncDocumentLang();
   renderLangButtons();
   document.querySelectorAll('.lang-btn').forEach(b => {
