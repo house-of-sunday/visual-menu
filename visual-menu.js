@@ -192,7 +192,7 @@ function switchLang(lang) {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: 'menu_language_change',
-      language: lang,
+      menu_language: lang,
       previous_language: previousLang
     });
   }
