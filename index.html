@@ -265,7 +265,10 @@
      attribute follows the language toggle, so en/ru/id are untouched. */
   :lang(zh) .item__desc,
   :lang(ja) .item__desc,
-  :lang(ko) .item__desc {
+  :lang(ko) .item__desc,
+  :lang(zh) .byo-card__support,
+  :lang(ja) .byo-card__support,
+  :lang(ko) .byo-card__support {
     font-size: 12.5px;
     font-weight: 600;
     line-height: 1.7;
@@ -391,6 +394,58 @@
   /* Description + tag remain hidden in the lightbox view. */
   .lb__body { display: none; }
 
+  /* ----- end-of-menu BYO card ----- */
+  /* One bordered card linking out to the Build Your Own menu on the main
+     site. The CTA inside reuses .tab wholesale for the Food/Drinks tab
+     typography; .tab--byo only adds what .tab cannot give a block link:
+     the Sun fill (on real tabs it comes from [aria-selected="true"],
+     which is invalid ARIA on a link) and block geometry. */
+  .byo-card {
+    display: block;
+    margin: 0 20px 60px;                 /* panel padding-bottom (80px) provides the gap above */
+    border: 1px solid var(--hos-ink); border-radius: 2px;
+    padding: 22px 20px 24px;
+    text-align: center;
+    text-decoration: none; color: var(--hos-ink);
+  }
+  .byo-card__title {
+    /* Base size is the SECOND-and-later-lines size; ::first-line below bumps
+       the lead line up. One field, one content newline, so a translator still
+       breaks wherever their language needs (their first line leads), or not
+       at all (a single-line title renders entirely at the lead size). */
+    font-family: var(--font-serif); font-size: 20px; line-height: 1.2;
+    letter-spacing: -0.015em;
+    margin: 0 0 10px;
+    /* Line breaks come from the Sanity content, one field per language —
+       never a <br> in markup, so each translation breaks where it needs to. */
+    white-space: pre-line;
+  }
+  .byo-card__title::first-line {
+    font-size: 26px;
+  }
+  .byo-card__support {
+    font-family: var(--font-mono); font-size: 11px; line-height: 1.6;
+    margin: 0 0 16px;
+    white-space: pre-line;
+  }
+  .tab--byo {
+    display: block; width: 100%;
+    text-align: center; text-decoration: none;
+    background: var(--hos-sun);
+    color: var(--hos-salt);
+    border-color: var(--hos-sun);
+  }
+  .byo-card:hover .tab--byo { opacity: 0.9; }
+  .byo-card:focus-visible {
+    outline: 2px solid var(--hos-sun);
+    outline-offset: 2px;
+  }
+  /* Florencesans SC has no U+2197 glyph; render the arrow in Satoshi. */
+  .byo-card__arrow {
+    font-family: var(--font-sans); font-size: 13px;
+    vertical-align: 2px; margin-left: 7px;
+  }
+
   /* ----- footer ----- */
   .foot {
     text-align: center; padding: 40px 20px 60px;
@@ -451,6 +506,18 @@
     <section class="panel" id="panel-food" role="tabpanel"></section>
     <section class="panel" id="panel-drinks" role="tabpanel" hidden></section>
   </main>
+
+  <!-- End-of-menu Build Your Own card. Sits OUTSIDE the panels so it renders
+       once and stays visible under both tabs. Text is filled by
+       renderByoCard() from the byo* labels (re-renders on language switch);
+       the URL is deliberately not localized. -->
+  <a class="byo-card" id="byoCard"
+     href="https://www.house-of-sunday.com/menu?tab=byo"
+     target="_blank" rel="noopener">
+    <h2 class="byo-card__title" id="byoCardTitle"></h2>
+    <p class="byo-card__support" id="byoCardSupport"></p>
+    <span class="tab tab--byo"><span id="byoCardCta"></span><span class="byo-card__arrow" aria-hidden="true">&#8599;</span></span>
+  </a>
 
   <footer class="foot">
     <div class="foot__script">Sundays are better than others.</div>

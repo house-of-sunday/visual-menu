@@ -9,14 +9,20 @@
 
 const MENU = window.MENU_DATA || { food: [], drinks: [] };
 
-// UI labels (tab names, toggle copy) come from the visualMenuUiLabels
-// singleton via the same generated file; hardcoded English if absent.
-const LABELS = MENU.labels || {
+// UI labels (tab names, toggle copy, BYO card) come from the
+// visualMenuUiLabels singleton via the same generated file; hardcoded
+// English if absent. Merged per key (not either/or) so a generated file
+// built before a label existed still renders English, never blank.
+const DEFAULT_LABELS = {
   foodTab: { en: 'Food' },
   drinksTab: { en: 'Drinks' },
   ingredients: { en: 'Ingredients' },
   itemsCount: { en: 'items' },
+  byoTitle: { en: 'Build Your Own\n(with macros)' },
+  byoSupport: { en: 'Pick your protein, bases, sides, vegetables and more. Macros, weight and calories on every ingredient. Build your plate in our macro calculator.' },
+  byoCta: { en: 'View BYO Menu' },
 };
+const LABELS = { ...DEFAULT_LABELS, ...(MENU.labels || {}) };
 
 // Adding a language = add its code here, a pill in index.html, and the
 // locale in the schema + build script.
@@ -167,6 +173,16 @@ function renderTabLabels() {
   document.querySelector('[data-tab="drinks"]').textContent = pick(LABELS.drinksTab);
 }
 
+// End-of-menu BYO card (static markup in index.html, rendered once and on
+// every language switch). Newlines in byoTitle/byoSupport are real content —
+// the elements render with `white-space: pre-line`, so textContent is enough
+// and each translation controls its own line breaks.
+function renderByoCard() {
+  document.getElementById('byoCardTitle').textContent = pick(LABELS.byoTitle);
+  document.getElementById('byoCardSupport').textContent = pick(LABELS.byoSupport);
+  document.getElementById('byoCardCta').textContent = pick(LABELS.byoCta);
+}
+
 function renderLangButtons() {
   document.querySelectorAll('.lang-btn').forEach(b =>
     b.setAttribute('aria-pressed', String(b.dataset.lang === currentLang))
@@ -196,6 +212,7 @@ function switchLang(lang) {
   syncDocumentLang();
   renderLangButtons();
   renderTabLabels();
+  renderByoCard();
   renderPanel('food');
   renderPanel('drinks');
   renderChips(currentTab);
@@ -349,6 +366,7 @@ function closeLightbox() {
 function init() {
   // Render both panels (we just hide the inactive one)
   renderTabLabels();
+  renderByoCard();
   renderPanel('food');
   renderPanel('drinks');
   renderChips('food');
@@ -371,6 +389,17 @@ function init() {
     panel.addEventListener('click', (e) => {
       const photoBtn = e.target.closest('.item__photo-btn');
       if (photoBtn) openLightbox(photoBtn);
+    });
+  });
+
+  // BYO card outbound click. Same dataLayer pattern as menu_language_change;
+  // the link opens in a new tab, so the push is never raced by navigation.
+  // The GTM trigger + GA4 tag for this event live in the container, not here.
+  document.getElementById('byoCard').addEventListener('click', () => {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'byo_link_click',
+      menu_language: currentLang
     });
   });
 

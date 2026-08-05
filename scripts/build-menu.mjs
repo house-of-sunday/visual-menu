@@ -49,7 +49,7 @@ const QUERY = `*[_type == "visualMenuSection"] | order(displayOrder asc){
   }
 }`
 
-const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount}`
+const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount, byoTitle, byoSupport, byoCta}`
 
 // Adding a language = add its code here (and to the schema + front-end LOCALES).
 const LOCALES = ['en', 'zh', 'ru', 'id', 'ja', 'ko']
@@ -61,6 +61,17 @@ const DEFAULT_LABELS = {
   drinksTab: { en: 'Drinks' },
   ingredients: { en: 'Ingredients' },
   itemsCount: { en: 'items' },
+  // BYO end-of-menu card. byoTitle/byoSupport hold literal newlines — the
+  // front-end renders them with `white-space: pre-line`, so where a line
+  // breaks is a per-language content decision, not markup.
+  byoTitle: { en: 'Build Your Own\n(with macros)' },
+  byoSupport: {
+    en:
+      'Pick your protein, bases, sides, vegetables and more. ' +
+      'Macros, weight and calories on every ingredient. ' +
+      'Build your plate in our macro calculator.',
+  },
+  byoCta: { en: 'View BYO Menu' },
 }
 
 // {en: ..., zh: ..., ru: ...} with null for missing locales; en falls back
