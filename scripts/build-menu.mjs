@@ -49,7 +49,7 @@ const QUERY = `*[_type == "visualMenuSection"] | order(displayOrder asc){
   }
 }`
 
-const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount, byoTitle, byoSupport, byoCta}`
+const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount, byoTitle, byoSupport, byoCta, reviewTitle, reviewSupport, reviewCta}`
 
 // Adding a language = add its code here (and to the schema + front-end LOCALES).
 const LOCALES = ['en', 'zh', 'ru', 'id', 'ja', 'ko']
@@ -72,6 +72,15 @@ const DEFAULT_LABELS = {
       'Build your plate in our macro calculator.',
   },
   byoCta: { en: 'View BYO Menu' },
+  // Review-invitation card, same mechanism as the BYO card.
+  reviewTitle: { en: 'Help us with a Review' },
+  reviewSupport: {
+    en:
+      "We know it can feel a bit awkward to ask, but your words make a huge " +
+      "difference for a small business like ours. As a thank you we'd love to " +
+      "offer you a coconut hydrate, perfect for staying hydrated in Bali.",
+  },
+  reviewCta: { en: 'LEAVE A REVIEW' },
 }
 
 // {en: ..., zh: ..., ru: ...} with null for missing locales; en falls back

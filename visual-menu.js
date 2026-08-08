@@ -21,6 +21,9 @@ const DEFAULT_LABELS = {
   byoTitle: { en: 'Build Your Own\n(with macros)' },
   byoSupport: { en: 'Pick your protein, bases, sides, vegetables and more. Macros, weight and calories on every ingredient. Build your plate in our macro calculator.' },
   byoCta: { en: 'View BYO Menu' },
+  reviewTitle: { en: 'Help us with a Review' },
+  reviewSupport: { en: "We know it can feel a bit awkward to ask, but your words make a huge difference for a small business like ours. As a thank you we'd love to offer you a coconut hydrate, perfect for staying hydrated in Bali." },
+  reviewCta: { en: 'LEAVE A REVIEW' },
 };
 const LABELS = { ...DEFAULT_LABELS, ...(MENU.labels || {}) };
 
@@ -183,6 +186,13 @@ function renderByoCard() {
   document.getElementById('byoCardCta').textContent = pick(LABELS.byoCta);
 }
 
+// Review-invitation card: same mechanism as the BYO card.
+function renderReviewCard() {
+  document.getElementById('reviewCardTitle').textContent = pick(LABELS.reviewTitle);
+  document.getElementById('reviewCardSupport').textContent = pick(LABELS.reviewSupport);
+  document.getElementById('reviewCardCta').textContent = pick(LABELS.reviewCta);
+}
+
 function renderLangButtons() {
   document.querySelectorAll('.lang-btn').forEach(b =>
     b.setAttribute('aria-pressed', String(b.dataset.lang === currentLang))
@@ -213,6 +223,7 @@ function switchLang(lang) {
   renderLangButtons();
   renderTabLabels();
   renderByoCard();
+  renderReviewCard();
   renderPanel('food');
   renderPanel('drinks');
   renderChips(currentTab);
@@ -367,6 +378,7 @@ function init() {
   // Render both panels (we just hide the inactive one)
   renderTabLabels();
   renderByoCard();
+  renderReviewCard();
   renderPanel('food');
   renderPanel('drinks');
   renderChips('food');
@@ -399,6 +411,13 @@ function init() {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: 'byo_link_click',
+      menu_language: currentLang
+    });
+  });
+  document.getElementById('reviewCard').addEventListener('click', () => {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'review_link_click',
       menu_language: currentLang
     });
   });

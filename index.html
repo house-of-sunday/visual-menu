@@ -394,20 +394,22 @@
   /* Description + tag remain hidden in the lightbox view. */
   .lb__body { display: none; }
 
-  /* ----- end-of-menu BYO card ----- */
-  /* One bordered card linking out to the Build Your Own menu on the main
-     site. The CTA inside reuses .tab wholesale for the Food/Drinks tab
-     typography; .tab--byo only adds what .tab cannot give a block link:
-     the Sun fill (on real tabs it comes from [aria-selected="true"],
-     which is invalid ARIA on a link) and block geometry. */
+  /* ----- end-of-menu cards (BYO + review) ----- */
+  /* Bordered cards linking out from the end of the menu; .byo-card is the
+     shared card component for both. The CTA inside reuses .tab wholesale
+     for the Food/Drinks tab typography; .tab--card-cta only adds what .tab
+     cannot give a block link: the Sun fill (on real tabs it comes from
+     [aria-selected="true"], which is invalid ARIA on a link) and block
+     geometry. */
   .byo-card {
     display: block;
-    margin: 0 20px 60px;                 /* panel padding-bottom (80px) provides the gap above */
+    margin: 0 20px 16px;                 /* panel padding-bottom (80px) provides the gap above */
     border: 1px solid var(--hos-ink); border-radius: 2px;
     padding: 22px 20px 24px;
     text-align: center;
     text-decoration: none; color: var(--hos-ink);
   }
+  .byo-card--last { margin-bottom: 60px; }  /* the last card carries the gap to the footer */
   .byo-card__title {
     /* Base size is the SECOND-and-later-lines size; ::first-line below bumps
        the lead line up. One field, one content newline, so a translator still
@@ -428,14 +430,14 @@
     margin: 0 0 16px;
     white-space: pre-line;
   }
-  .tab--byo {
+  .tab--card-cta {
     display: block; width: 100%;
     text-align: center; text-decoration: none;
     background: var(--hos-sun);
     color: var(--hos-salt);
     border-color: var(--hos-sun);
   }
-  .byo-card:hover .tab--byo { opacity: 0.9; }
+  .byo-card:hover .tab--card-cta { opacity: 0.9; }
   .byo-card:focus-visible {
     outline: 2px solid var(--hos-sun);
     outline-offset: 2px;
@@ -516,7 +518,19 @@
      target="_blank" rel="noopener">
     <h2 class="byo-card__title" id="byoCardTitle"></h2>
     <p class="byo-card__support" id="byoCardSupport"></p>
-    <span class="tab tab--byo"><span id="byoCardCta"></span><span class="byo-card__arrow" aria-hidden="true">&#8599;</span></span>
+    <span class="tab tab--card-cta"><span id="byoCardCta"></span><span class="byo-card__arrow" aria-hidden="true">&#8599;</span></span>
+  </a>
+
+  <!-- Review-invitation card, same mechanism as the BYO card above. Text is
+       filled by renderReviewCard() from the review* labels; the URL is
+       deliberately not localized and must stay byte-identical to the one the
+       owner supplied (the &amp; entities below resolve to plain & in the DOM). -->
+  <a class="byo-card byo-card--last" id="reviewCard"
+     href="https://www.google.com/search?sca_esv=ef5c9cfd86438e8a&amp;si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E-4jP11I2_SHJ7Sfo_7iGW_R_Dqi3Uq5hZRc2w9-zZbFLv1A0-2iT9vHYvmTM97CixIIMucqxvS8M5YcxskVbQ_yzbqa&amp;q=Sunday+Kitchen+Reviews&amp;sa=X&amp;ved=2ahUKEwj59vDn6fCPAxXgxTgGHaDgKi0Q0bkNegQILhAE&amp;biw=1422&amp;bih=612&amp;dpr=1.35"
+     target="_blank" rel="noopener">
+    <h2 class="byo-card__title" id="reviewCardTitle"></h2>
+    <p class="byo-card__support" id="reviewCardSupport"></p>
+    <span class="tab tab--card-cta"><span id="reviewCardCta"></span><span class="byo-card__arrow" aria-hidden="true">&#8599;</span></span>
   </a>
 
   <footer class="foot">
