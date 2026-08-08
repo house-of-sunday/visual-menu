@@ -511,8 +511,11 @@
 
   <!-- End-of-menu Build Your Own card. Sits OUTSIDE the panels so it renders
        once and stays visible under both tabs. Text is filled by
-       renderByoCard() from the byo* labels (re-renders on language switch);
-       the URL is deliberately not localized. -->
+       renderByoCard() from the byo* labels (re-renders on language switch).
+       The canonical destination is the Sanity byoUrl field (applied by
+       applyCardUrls()); the href below is a deliberate FALLBACK behind that
+       working Sanity read, not a centralisation violation — it only surfaces
+       if the field is empty or the generated data predates it. -->
   <a class="byo-card" id="byoCard"
      href="https://www.house-of-sunday.com/menu?tab=byo"
      target="_blank" rel="noopener">
@@ -522,9 +525,12 @@
   </a>
 
   <!-- Review-invitation card, same mechanism as the BYO card above. Text is
-       filled by renderReviewCard() from the review* labels; the URL is
-       deliberately not localized and must stay byte-identical to the one the
-       owner supplied (the &amp; entities below resolve to plain & in the DOM). -->
+       filled by renderReviewCard() from the review* labels. The canonical
+       destination is the Sanity reviewUrl field (applied by applyCardUrls());
+       the href below is a deliberate FALLBACK behind that working Sanity
+       read, not a centralisation violation. The URL is opaque and must stay
+       byte-identical to the owner-supplied string (the &amp; entities below
+       resolve to plain & in the DOM). -->
   <a class="byo-card byo-card--last" id="reviewCard"
      href="https://www.google.com/search?sca_esv=ef5c9cfd86438e8a&amp;si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E-4jP11I2_SHJ7Sfo_7iGW_R_Dqi3Uq5hZRc2w9-zZbFLv1A0-2iT9vHYvmTM97CixIIMucqxvS8M5YcxskVbQ_yzbqa&amp;q=Sunday+Kitchen+Reviews&amp;sa=X&amp;ved=2ahUKEwj59vDn6fCPAxXgxTgGHaDgKi0Q0bkNegQILhAE&amp;biw=1422&amp;bih=612&amp;dpr=1.35"
      target="_blank" rel="noopener">

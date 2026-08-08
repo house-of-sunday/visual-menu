@@ -193,6 +193,19 @@ function renderReviewCard() {
   document.getElementById('reviewCardCta').textContent = pick(LABELS.reviewCta);
 }
 
+// Card destinations are Sanity-managed (settings live on the same
+// visualMenuUiLabels singleton; language-independent, so not locale fields).
+// The hrefs already present in index.html's markup are deliberate FALLBACKS,
+// not centralisation violations: they only stay in effect when the Sanity
+// field is empty or the generated data predates it, so the buttons can never
+// render without a working destination. Applied once — URLs don't change with
+// the language toggle.
+function applyCardUrls() {
+  const urls = MENU.urls || {};
+  if (urls.byo) document.getElementById('byoCard').href = urls.byo;
+  if (urls.review) document.getElementById('reviewCard').href = urls.review;
+}
+
 function renderLangButtons() {
   document.querySelectorAll('.lang-btn').forEach(b =>
     b.setAttribute('aria-pressed', String(b.dataset.lang === currentLang))
@@ -379,6 +392,7 @@ function init() {
   renderTabLabels();
   renderByoCard();
   renderReviewCard();
+  applyCardUrls();
   renderPanel('food');
   renderPanel('drinks');
   renderChips('food');
