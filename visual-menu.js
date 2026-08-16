@@ -36,7 +36,7 @@ const SUPPORTED_LANGS = ['en', 'zh', 'ru', 'id', 'ja', 'ko'];
 // numerals; universal menu convention).
 const NO_SPACE_COUNT_LANGS = ['zh', 'ja', 'ko'];
 
-// ----- deep-link parameters (?lang= / ?section=) -----
+// ----- deep-link parameters (?lang= / ?section= / ?tab=) -----
 // Parsed at module load, BEFORE the first render, so a URL-specified language
 // is applied to the very first paint rather than flashing the stored/default
 // language and re-rendering.
@@ -45,15 +45,21 @@ const deepLink = (() => {
   try {
     params = new URLSearchParams(window.location.search);
   } catch {
-    return { lang: null, section: null };
+    return { lang: null, section: null, tab: null };
   }
   const rawLang = (params.get('lang') || '').trim().toLowerCase();
   const rawSection = (params.get('section') || '').trim().toLowerCase();
+  const rawTab = (params.get('tab') || '').trim().toLowerCase();
   return {
     // Only accept languages we actually ship; anything else is ignored so a
     // stale or hand-edited link degrades to normal behaviour.
     lang: SUPPORTED_LANGS.includes(rawLang) ? rawLang : null,
     section: rawSection || null,
+    // ?tab= is the printed-QR spelling (matches the main site's /menu?tab=).
+    // Strictly the two tab names; anything else falls through to the default
+    // silently. When both ?tab= and ?section= are present and the section
+    // resolves, section wins — it's the more specific instruction.
+    tab: rawTab === 'food' || rawTab === 'drinks' ? rawTab : null,
   };
 })();
 
@@ -277,7 +283,9 @@ function resolveSectionTarget(value) {
 // a page load, not a user gesture — a scroll animation on arrival reads as a
 // glitch and can be interrupted by the visitor's own scrolling.
 function applyDeepLinkSection() {
-  const target = resolveSectionTarget(deepLink.section);
+  // ?section= takes precedence when it resolves; ?tab= is the fallback.
+  const target = resolveSectionTarget(deepLink.section)
+    || (deepLink.tab ? { tab: deepLink.tab, sectionKey: null } : null);
   if (!target) return;
 
   // Requirement: never try to scroll to a panel the tab system has hidden.
