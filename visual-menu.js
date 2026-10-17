@@ -425,6 +425,13 @@ function closeLightbox() {
 // link-click triggers catch. Every row opens in a new tab, so the push is
 // never raced by navigation.
 const WA_NUMBER = '6281338570957';
+
+// Location opens the House of Sunday Google profile, never a route. Same URL
+// as the main site footer's Location link, whose canonical copy is Sanity
+// (production dataset, settings.contactDetails.googleMapsLocation). The menu
+// build reads only the isolated `menu` dataset by design, so it is one
+// constant here; keep it in step with that field.
+const LOCATION_URL = 'https://www.google.com/maps/search/?api=1&query=House+of+Sunday+Canggu&query_place_id=ChIJBcy8yP850i0R0QgUp10abxs';
 const DEFAULT_BOOK_TEXT = "Hi, I'd like to book a table";
 const buildBookHref = (text) =>
   `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text || DEFAULT_BOOK_TEXT)}`;
@@ -493,9 +500,11 @@ function initVisitorMode() {
   document.getElementById('byoCard').classList.add('byo-card--last');
 
   document.getElementById('visitBar').hidden = false;
-  document.getElementById('visitLocation').addEventListener('click', () => {
+  const locationLink = document.getElementById('visitLocation');
+  locationLink.href = LOCATION_URL;
+  locationLink.addEventListener('click', () => {
     window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: 'directions_click', wa_source: 'menu:' + visitorSrc });
+    window.dataLayer.push({ event: 'location_click', wa_source: 'menu:' + visitorSrc });
   });
 
   renderOrderLinks();
