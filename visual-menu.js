@@ -430,7 +430,7 @@ const buildBookHref = (text) =>
   `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text || DEFAULT_BOOK_TEXT)}`;
 
 const ORDER_LINKS = [
-  { label: 'Book a table', href: buildBookHref(DEFAULT_BOOK_TEXT), intent: 'book', highlight: true },
+  { label: 'Book a table', href: buildBookHref(DEFAULT_BOOK_TEXT), intent: 'book' },
   { label: 'Order via WhatsApp', href: "https://wa.me/6281338570957?text=Hi%2C%20I'd%20like%20to%20order%20takeaway", intent: 'order-takeaway' },
   { label: 'Order on GoFood', href: 'https://gofood.link/a/Fw83yaw' },
   { label: 'Order on Grab', href: 'https://r.grab.com/o/jYJbIrQf' },
@@ -448,11 +448,11 @@ function trackWhatsappClick(intent) {
 function renderOrderLinks() {
   const list = document.getElementById('bookSheetList');
   list.innerHTML = ORDER_LINKS.map(link => `
-    <li><a class="sheet__row${link.highlight ? ' sheet__row--primary' : ''}"
+    <li><a class="sheet__row"
            href="${link.href.replace(/"/g, '&quot;')}"
            ${link.intent ? `data-wa-intent="${link.intent}"` : ''}
            target="_blank" rel="noopener noreferrer nofollow">
-      <span>${link.label}</span><span class="sheet__arrow" aria-hidden="true">&#8599;</span>
+      ${link.label}
     </a></li>`).join('');
   list.addEventListener('click', (e) => {
     const row = e.target.closest('[data-wa-intent]');

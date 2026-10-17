@@ -479,6 +479,10 @@
     padding-bottom: calc(var(--space-9) + env(safe-area-inset-bottom));
   }
 
+  /* Type sizes below are px, like the rest of this page: colors_and_type.css
+     sets html { font-size: var(--fs-14) }, so the rem-based --fs-* tokens
+     render at 87.5% here (--fs-13 would be 11.4px). Values match the token
+     names and the main site's drawer (13px rows). */
   .visit-bar {
     position: fixed; z-index: 40;
     left: 0; right: 0; bottom: 0;
@@ -497,11 +501,24 @@
      the Location <a> would otherwise inherit the body's line-height (a
      <button> does not), which makes it taller than the tabs. */
   .visit-bar__btn {
-    display: block; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%;
+    min-height: 44px;                       /* the Food / Drinks tab height */
+    padding-left: var(--space-3); padding-right: var(--space-3);
     font-family: var(--font-display); line-height: normal;
     border-radius: var(--radius-xs);
-    text-align: center; text-decoration: none;
-    white-space: nowrap;                    /* keep the 44px tab height at 375px */
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  /* Below 428px wide (iPhone Pro Max width) "BOOK / ORDER" no longer fits
+     at the tab size inside --space-3 side padding (16px does not fit at
+     375px either, even untracked), so both labels step down to 14px with
+     --tr-wide tracking. Fits down to 360px-wide phones. */
+  @media (max-width: 427px) {
+    .visit-bar__btn {
+      font-size: 14px;                    /* px, see the type note above .visit-bar */
+      letter-spacing: var(--tr-wide);
+    }
   }
   .visit-bar__btn--primary {
     background: var(--hos-ink);
@@ -522,7 +539,7 @@
   .sheet__panel {
     position: absolute; left: 0; right: 0; bottom: 0;
     max-width: 540px; margin: 0 auto;
-    background: var(--hos-salt);
+    background: var(--hos-sand);
     border-radius: var(--radius-md) var(--radius-md) 0 0;
     padding: var(--space-5) var(--space-4);
     padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
@@ -537,7 +554,7 @@
   .sheet__title {
     font-family: var(--font-display); font-weight: 400;
     text-transform: uppercase; letter-spacing: 0.05em;
-    font-size: var(--fs-18); line-height: 1;
+    font-size: 18px; line-height: 1;
     color: var(--hos-ink);
     margin: 0;
   }
@@ -545,27 +562,24 @@
     -webkit-appearance: none; appearance: none;
     background: transparent; border: 0; padding: 0;
     cursor: pointer;
-    font-family: var(--font-sans); font-size: var(--fs-24); line-height: 1;
+    font-family: var(--font-sans); font-size: 24px; line-height: 1;
     color: var(--hos-ink);
   }
-  .sheet__list { list-style: none; margin: 0; padding: 0; }
-  .sheet__list li + li { border-top: 1px solid var(--hos-line); }
+  /* Rows match the main site drawer's text links: Florencesans, uppercase,
+     13px, 0.05em tracking, line-height 1, all in Ink. Left-aligned here. */
+  .sheet__list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: var(--space-2);
+  }
   .sheet__row {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-3);
-    font-family: var(--font-mono); font-size: var(--fs-13);
-    text-transform: uppercase; letter-spacing: var(--tr-caps);
+    display: block;
+    padding: var(--space-2) 0;
+    font-family: var(--font-display); font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.05em;
     line-height: 1;
     color: var(--hos-ink); text-decoration: none;
   }
-  .sheet__row--primary {
-    background: var(--hos-ink);
-    color: var(--hos-salt);
-    border-radius: var(--radius-xs);
-  }
-  /* Arrow in Satoshi, same as the end-of-menu cards' arrow. */
-  .sheet__arrow { font-family: var(--font-sans); }
+  .sheet__row:visited { color: var(--hos-ink); }
   .sheet__row:focus-visible,
   .sheet__close:focus-visible {
     outline: 2px solid var(--hos-ink);
