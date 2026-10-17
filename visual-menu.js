@@ -63,6 +63,29 @@ const deepLink = (() => {
   };
 })();
 
+// ----- visitor mode (?src=) -----
+// Table guests scan the printed QR (no ?src=) and get the menu exactly as
+// before. Visitors still deciding arrive with ?src= (ads = Google Ads
+// sitelinks, ig = Instagram bio; any other value also counts) and get the
+// Location + Book / Order bar instead of the review card. The src is kept in
+// sessionStorage for the rest of the visit; storage can throw (private mode,
+// blocked site data), in which case the URL alone decides. Language and tab
+// switches never touch the URL or reload, so the URL keeps it too.
+// Normalised to a short slug because it ends up in dataLayer (wa_source).
+const VISITOR_SRC_KEY = 'hos_menu_src';
+const visitorSrc = (() => {
+  let fromUrl = '';
+  try {
+    fromUrl = (new URLSearchParams(window.location.search).get('src') || '')
+      .trim().toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 32);
+  } catch {}
+  if (fromUrl) {
+    try { sessionStorage.setItem(VISITOR_SRC_KEY, fromUrl); } catch {}
+    return fromUrl;
+  }
+  try { return sessionStorage.getItem(VISITOR_SRC_KEY) || null; } catch { return null; }
+})();
+
 // Precedence: ?lang= > English. Every visit starts in English by design —
 // a language chosen on a previous visit is deliberately not carried over, so
 // the menu presents the same way to everyone arriving fresh. Switching during
@@ -255,7 +278,7 @@ let currentTab = 'food';
 
 function switchTab(tab) {
   currentTab = tab;
-  document.querySelectorAll('.tab').forEach(t =>
+  document.querySelectorAll('.tab[role="tab"]').forEach(t =>
     t.setAttribute('aria-selected', t.dataset.tab === tab ? 'true' : 'false')
   );
   document.getElementById('panel-food').hidden = tab !== 'food';
@@ -394,8 +417,102 @@ function closeLightbox() {
   }
 }
 
+// ----- Book / Order drawer (visitor mode) -----
+// Port of the main site's Book / Order drawer (sunday-website
+// components/book-order-modal.jsx): same four options, same order, same
+// links; WhatsApp rows push whatsapp_click (the main site's WhatsappLink /
+// trackWhatsappClick), GoFood and Grab are plain links that GTM's existing
+// link-click triggers catch. Every row opens in a new tab, so the push is
+// never raced by navigation.
+const WA_NUMBER = '6281338570957';
+const DEFAULT_BOOK_TEXT = "Hi, I'd like to book a table";
+const buildBookHref = (text) =>
+  `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text || DEFAULT_BOOK_TEXT)}`;
+
+const ORDER_LINKS = [
+  { label: 'Book a table', href: buildBookHref(DEFAULT_BOOK_TEXT), intent: 'book', highlight: true },
+  { label: 'Order via WhatsApp', href: "https://wa.me/6281338570957?text=Hi%2C%20I'd%20like%20to%20order%20takeaway", intent: 'order-takeaway' },
+  { label: 'Order on GoFood', href: 'https://gofood.link/a/Fw83yaw' },
+  { label: 'Order on Grab', href: 'https://r.grab.com/o/jYJbIrQf' },
+];
+
+function trackWhatsappClick(intent) {
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: 'whatsapp_click',
+    wa_source: 'menu:' + visitorSrc,
+    wa_intent: intent || 'unknown',
+  });
+}
+
+function renderOrderLinks() {
+  const list = document.getElementById('bookSheetList');
+  list.innerHTML = ORDER_LINKS.map(link => `
+    <li><a class="sheet__row${link.highlight ? ' sheet__row--primary' : ''}"
+           href="${link.href.replace(/"/g, '&quot;')}"
+           ${link.intent ? `data-wa-intent="${link.intent}"` : ''}
+           target="_blank" rel="noopener noreferrer nofollow">
+      <span>${link.label}</span><span class="sheet__arrow" aria-hidden="true">&#8599;</span>
+    </a></li>`).join('');
+  list.addEventListener('click', (e) => {
+    const row = e.target.closest('[data-wa-intent]');
+    if (row) trackWhatsappClick(row.dataset.waIntent);
+  });
+}
+
+let sheetReturnFocus = null;
+
+function openSheet() {
+  const sheet = document.getElementById('bookSheet');
+  // iOS Safari does not focus a tapped button, so fall back to the trigger.
+  sheetReturnFocus = (document.activeElement && document.activeElement !== document.body)
+    ? document.activeElement
+    : document.getElementById('visitBook');
+  sheet.hidden = false;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('bookSheetPanel').focus();
+}
+function closeSheet() {
+  const sheet = document.getElementById('bookSheet');
+  if (sheet.hidden) return;
+  sheet.hidden = true;
+  document.body.style.overflow = '';
+  if (sheetReturnFocus && typeof sheetReturnFocus.focus === 'function') {
+    sheetReturnFocus.focus({ preventScroll: true });
+  }
+  sheetReturnFocus = null;
+}
+
+function initVisitorMode() {
+  if (!visitorSrc) return;
+  document.body.classList.add('is-visitor');
+
+  // The review card only makes sense after a visit; the BYO card then
+  // carries the end-of-menu gap instead.
+  document.getElementById('reviewCard').hidden = true;
+  document.getElementById('byoCard').classList.add('byo-card--last');
+
+  document.getElementById('visitBar').hidden = false;
+  document.getElementById('visitLocation').addEventListener('click', () => {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'directions_click', wa_source: 'menu:' + visitorSrc });
+  });
+
+  renderOrderLinks();
+  document.getElementById('visitBook').addEventListener('click', openSheet);
+  document.getElementById('bookSheetClose').addEventListener('click', closeSheet);
+  // Tapping the dimmed area (outside the panel) closes it.
+  document.getElementById('bookSheet').addEventListener('click', (e) => {
+    if (e.target.id === 'bookSheet') closeSheet();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSheet();
+  });
+}
+
 // ----- init -----
 function init() {
+  initVisitorMode();
   // Render both panels (we just hide the inactive one)
   renderTabLabels();
   renderByoCard();
@@ -412,8 +529,10 @@ function init() {
     b.addEventListener('click', () => switchLang(b.dataset.lang));
   });
 
-  // Tabs: swap aria-selected and switch panels
-  document.querySelectorAll('.tab').forEach(t => {
+  // Tabs: swap aria-selected and switch panels. Scoped to role="tab": the
+  // card CTAs and the visitor bar reuse the .tab class for its look, and a
+  // click on them must not call switchTab(undefined) (which hid both panels).
+  document.querySelectorAll('.tab[role="tab"]').forEach(t => {
     t.addEventListener('click', () => switchTab(t.dataset.tab));
   });
 

@@ -466,6 +466,111 @@
     color: var(--hos-ink);
     white-space: nowrap;
   }
+
+  /* ----- visitor mode (?src=) ----- */
+  /* Arrivals from Google Ads sitelinks / the Instagram bio carry ?src=; the
+     table QR does not. Visitor mode hides the review card and adds a sticky
+     Location + Book / Order bar. JS sets body.is-visitor and un-hides the
+     bar; table mode never sees any of this. */
+  .byo-card[hidden] { display: none; }
+  /* Bar height is 2 × --space-3 + a 44px tab row + the safe-area inset;
+     --space-9 is the smallest spacing token that clears it. */
+  body.is-visitor .shell {
+    padding-bottom: calc(var(--space-9) + env(safe-area-inset-bottom));
+  }
+
+  .visit-bar {
+    position: fixed; z-index: 40;
+    left: 0; right: 0; bottom: 0;
+    max-width: 540px; margin: 0 auto;       /* same column as .shell */
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+    background: var(--hos-sand);
+    border-top: 1px solid var(--hos-line);
+  }
+  .visit-bar[hidden] { display: none; }
+  /* Buttons reuse .tab wholesale (size, tracking, uppercase, ink border,
+     transparent fill = the inactive tab), so they stay identical to the
+     Food / Drinks tabs if those ever change. line-height: normal because
+     the Location <a> would otherwise inherit the body's line-height (a
+     <button> does not), which makes it taller than the tabs. */
+  .visit-bar__btn {
+    display: block; width: 100%;
+    font-family: var(--font-display); line-height: normal;
+    border-radius: var(--radius-xs);
+    text-align: center; text-decoration: none;
+    white-space: nowrap;                    /* keep the 44px tab height at 375px */
+  }
+  .visit-bar__btn--primary {
+    background: var(--hos-ink);
+    color: var(--hos-salt);
+  }
+  .visit-bar__btn:focus-visible {
+    outline: 2px solid var(--hos-ink);
+    outline-offset: 2px;
+  }
+
+  /* Book / Order drawer: bottom sheet over a dimmed page. */
+  .sheet {
+    position: fixed; inset: 0; z-index: 900;   /* above the bar, below the lightbox */
+    background: color-mix(in srgb, var(--hos-ink) 35%, transparent);
+    cursor: pointer;
+  }
+  .sheet[hidden] { display: none; }
+  .sheet__panel {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    max-width: 540px; margin: 0 auto;
+    background: var(--hos-salt);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding: var(--space-5) var(--space-4);
+    padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+    cursor: auto;
+    outline: none;
+  }
+  .sheet__head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .sheet__title {
+    font-family: var(--font-display); font-weight: 400;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    font-size: var(--fs-18); line-height: 1;
+    color: var(--hos-ink);
+    margin: 0;
+  }
+  .sheet__close {
+    -webkit-appearance: none; appearance: none;
+    background: transparent; border: 0; padding: 0;
+    cursor: pointer;
+    font-family: var(--font-sans); font-size: var(--fs-24); line-height: 1;
+    color: var(--hos-ink);
+  }
+  .sheet__list { list-style: none; margin: 0; padding: 0; }
+  .sheet__list li + li { border-top: 1px solid var(--hos-line); }
+  .sheet__row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-3);
+    font-family: var(--font-mono); font-size: var(--fs-13);
+    text-transform: uppercase; letter-spacing: var(--tr-caps);
+    line-height: 1;
+    color: var(--hos-ink); text-decoration: none;
+  }
+  .sheet__row--primary {
+    background: var(--hos-ink);
+    color: var(--hos-salt);
+    border-radius: var(--radius-xs);
+  }
+  /* Arrow in Satoshi, same as the end-of-menu cards' arrow. */
+  .sheet__arrow { font-family: var(--font-sans); }
+  .sheet__row:focus-visible,
+  .sheet__close:focus-visible {
+    outline: 2px solid var(--hos-ink);
+    outline-offset: 2px;
+  }
 </style>
 </head>
 <body>
@@ -543,6 +648,31 @@
     <div class="foot__script">Sundays are better than others.</div>
     <div class="foot__meta">House of Sunday · Made slowly in Canggu</div>
   </footer>
+</div>
+
+<!-- ============= VISITOR MODE (?src=) ============= -->
+<!-- Hidden in table mode; visitor-mode JS un-hides the bar. Same pair as the
+     main site footer: Location + Book / Order. Labels are English in every
+     language for now. -->
+<div class="visit-bar" id="visitBar" hidden>
+  <a class="tab visit-bar__btn" id="visitLocation"
+     href="https://www.google.com/maps/dir/?api=1&amp;destination=House+of+Sunday+Canggu&amp;destination_place_id=ChIJBcy8yP850i0R0QgUp10abxs"
+     target="_blank" rel="noopener noreferrer">Location</a>
+  <button class="tab visit-bar__btn visit-bar__btn--primary" id="visitBook"
+          type="button" aria-haspopup="dialog" aria-controls="bookSheet">Book / Order</button>
+</div>
+
+<!-- Book / Order drawer. Rows are rendered by renderOrderLinks() from
+     ORDER_LINKS in visual-menu.js (port of the main site's buildOrderLinks). -->
+<div class="sheet" id="bookSheet" hidden>
+  <div class="sheet__panel" id="bookSheetPanel" role="dialog" aria-modal="true"
+       aria-labelledby="bookSheetTitle" tabindex="-1">
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="bookSheetTitle">Book or order</h2>
+      <button class="sheet__close" id="bookSheetClose" type="button" aria-label="Close">&times;</button>
+    </div>
+    <ul class="sheet__list" id="bookSheetList"></ul>
+  </div>
 </div>
 
 <!-- ============= LIGHTBOX ============= -->
