@@ -52,7 +52,7 @@ const QUERY = `*[_type == "visualMenuSection"] | order(displayOrder asc){
 const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount, byoTitle, byoSupport, byoCta, byoUrl, reviewTitle, reviewSupport, reviewCta, reviewUrl}`
 
 // Adding a language = add its code here (and to the schema + front-end LOCALES).
-const LOCALES = ['en', 'zh', 'ru', 'id', 'ja', 'ko']
+const LOCALES = ['en', 'zh', 'ru', 'id', 'ja', 'ko', 'ar']
 
 // English defaults keep the site building even before the labels singleton
 // exists in the dataset (and double as the en fallback shape).

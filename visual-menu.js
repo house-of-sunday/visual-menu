@@ -29,7 +29,7 @@ const LABELS = { ...DEFAULT_LABELS, ...(MENU.labels || {}) };
 
 // Adding a language = add its code here, a pill in index.html, and the
 // locale in the schema + build script.
-const SUPPORTED_LANGS = ['en', 'zh', 'ru', 'id', 'ja', 'ko'];
+const SUPPORTED_LANGS = ['en', 'zh', 'ru', 'id', 'ja', 'ko', 'ar'];
 
 // Counters that attach directly to the number: CJK (「4款」,「4品」) and
 // Korean ("4가지" — 한글 맞춤법 §43 permits attaching counters to Arabic
@@ -103,13 +103,22 @@ function pick(field) {
 // no space), "4 позиции" (ru). A label holding pipe-separated plural forms
 // (e.g. "позиция|позиции|позиций" = one|few|many) is resolved per count via
 // the browser's native plural rules for the current language.
+// Languages with more categories (Arabic: zero/one/two/few/many/other) can
+// name them instead: "one:صنف|two:صنفان|few:أصناف|many:صنفًا|other:صنف".
+// A missing category falls back to `other`, then to the last form.
 function itemsCountLabel(n) {
   let label = pick(LABELS.itemsCount);
   if (label.includes('|')) {
     const forms = label.split('|');
     const category = new Intl.PluralRules(currentLang).select(n);
-    const index = { one: 0, few: 1, many: 2 }[category];
-    label = forms[index !== undefined ? index : forms.length - 1] || forms[forms.length - 1];
+    const named = forms.map(f => f.match(/^\s*(zero|one|two|few|many|other)\s*:(.*)$/));
+    if (named.some(Boolean)) {
+      const byCategory = Object.fromEntries(named.filter(Boolean).map(m => [m[1], m[2].trim()]));
+      label = byCategory[category] || byCategory.other || forms[forms.length - 1];
+    } else {
+      const index = { one: 0, few: 1, many: 2 }[category];
+      label = forms[index !== undefined ? index : forms.length - 1] || forms[forms.length - 1];
+    }
   }
   const noSpace = NO_SPACE_COUNT_LANGS.includes(currentLang) && LABELS.itemsCount[currentLang];
   return noSpace ? `${n}${label}` : `${n} ${label}`;
@@ -245,8 +254,12 @@ function renderLangButtons() {
 // for CJK: zh and ja share Han-unified codepoints, and system fallback fonts
 // pick regional glyph shapes from the document language — with a wrong/static
 // lang, Japanese kanji can render with Chinese-styled glyphs (and vice versa).
+// Direction follows too: Arabic mirrors the whole layout (flex rows, chip
+// scroll origin, text alignment) via dir="rtl" on <html>.
+const RTL_LANGS = ['ar'];
 function syncDocumentLang() {
   document.documentElement.lang = currentLang;
+  document.documentElement.dir = RTL_LANGS.includes(currentLang) ? 'rtl' : 'ltr';
 }
 
 function switchLang(lang) {
