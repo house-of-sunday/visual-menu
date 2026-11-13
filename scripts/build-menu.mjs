@@ -45,11 +45,11 @@ const urlFor = (source) => imageUrlBuilder(client).image(source)
 const QUERY = `*[_type == "visualMenuSection"] | order(displayOrder asc){
   _id, key, tab, title, displayOrder,
   "items": *[_type == "visualMenuItem" && references(^._id)] | order(displayOrder asc){
-    _id, name, description, tag, displayOrder, image
+    _id, name, description, tag, containsPork, porkOnRequest, note, displayOrder, image
   }
 }`
 
-const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount, byoTitle, byoSupport, byoCta, byoUrl, reviewTitle, reviewSupport, reviewCta, reviewUrl}`
+const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount, byoTitle, byoSupport, byoCta, byoUrl, reviewTitle, reviewSupport, reviewCta, reviewUrl, porkTag, porkOnRequestNote, kitchenNote}`
 
 // Adding a language = add its code here (and to the schema + front-end LOCALES).
 const LOCALES = ['en', 'zh', 'ru', 'id', 'ja', 'ko', 'ar']
@@ -81,6 +81,12 @@ const DEFAULT_LABELS = {
       "offer you a coconut hydrate, perfect for staying hydrated in Bali.",
   },
   reviewCta: { en: 'LEAVE A REVIEW' },
+  // Dietary / preparation notes (localeNote in the schema). Deliberately NO
+  // English default: these switch on language by language, so a language
+  // shows the note only once its text is filled in Studio.
+  porkTag: {},
+  porkOnRequestNote: {},
+  kitchenNote: {},
 }
 
 // {en: ..., zh: ..., ru: ...} with null for missing locales; en falls back
@@ -119,6 +125,11 @@ async function main() {
     name: shapeLocale(item.name),
     desc: item.description ? shapeLocale(item.description) : null,
     tag: item.tag ? shapeLocale(item.tag) : null,
+    // Language-independent facts; the text comes from the porkTag /
+    // porkOnRequestNote labels, so each language switches on separately.
+    pork: Boolean(item.containsPork),
+    porkOnRequest: Boolean(item.containsPork && item.porkOnRequest),
+    note: item.note ? shapeLocale(item.note) : null,
     img: item.image
       ? urlFor(item.image).width(800).fit('max').auto('format').quality(80).url()
       : null,

@@ -4,7 +4,8 @@
 // and written to menu-data.generated.js as `window.MENU_DATA`, loaded before
 // this file. MENU_DATA shape: { food: [section], drinks: [section] } where
 // section = { key, title: {<locale>: string}, items: [item] } and
-// item = { name, desc, tag: {<locale>: string}|null, img: url|null },
+// item = { name, desc, tag: {<locale>: string}|null, img: url|null,
+//          pork: bool, porkOnRequest: bool, note: {<locale>: string}|null },
 // with one key per entry in SUPPORTED_LANGS below.
 
 const MENU = window.MENU_DATA || { food: [], drinks: [] };
@@ -99,6 +100,13 @@ function pick(field) {
   return field[currentLang] || field.en;
 }
 
+// Dietary / preparation notes (pork tag, bacon-on-request, item notes,
+// kitchen note) switch on language by language: they show ONLY where the
+// current language has text, never an English fallback.
+function pickExact(field) {
+  return (field && field[currentLang]) || '';
+}
+
 // Count labels: "4 items" (en), "4款" (zh — measure words attach directly,
 // no space), "4 позиции" (ru). A label holding pipe-separated plural forms
 // (e.g. "позиция|позиции|позиций" = one|few|many) is resolved per count via
@@ -139,6 +147,9 @@ const itemCard = (item, sectionKey) => {
   const name = pick(item.name);
   const desc = item.desc ? pick(item.desc) : '';
   const tag  = item.tag ? pick(item.tag) : '';
+  const porkTag = item.pork ? pickExact(LABELS.porkTag) : '';
+  const porkNote = item.porkOnRequest && porkTag ? pickExact(LABELS.porkOnRequestNote) : '';
+  const note = pickExact(item.note);
   const safeName = name.replace(/"/g, '&quot;');
   const safeDesc = desc.replace(/"/g, '&quot;');
   const safeTag  = tag.replace(/"/g, '&quot;');
@@ -162,6 +173,9 @@ const itemCard = (item, sectionKey) => {
       <p class="item__desc">${desc}</p>
     </details>` : ''}
     ${tag ? `<div class="item__tag">${tag}</div>` : ''}
+    ${porkTag ? `<div class="item__tag">${porkTag}</div>` : ''}
+    ${porkNote ? `<p class="item__desc">${porkNote}</p>` : ''}
+    ${note ? `<p class="item__desc">${note}</p>` : ''}
   </article>`;
 };
 
@@ -225,6 +239,15 @@ function renderByoCard() {
 }
 
 // Review-invitation card: same mechanism as the BYO card.
+// Footer kitchen note ("prepared in a shared kitchen"): hidden in languages
+// without text, like the other dietary notes.
+function renderKitchenNote() {
+  const el = document.getElementById('kitchenNote');
+  const text = pickExact(LABELS.kitchenNote);
+  el.textContent = text;
+  el.hidden = !text;
+}
+
 function renderReviewCard() {
   document.getElementById('reviewCardTitle').textContent = pick(LABELS.reviewTitle);
   document.getElementById('reviewCardSupport').textContent = pick(LABELS.reviewSupport);
@@ -279,6 +302,7 @@ function switchLang(lang) {
   renderTabLabels();
   renderByoCard();
   renderReviewCard();
+  renderKitchenNote();
   renderPanel('food');
   renderPanel('drinks');
   renderChips(currentTab);
@@ -539,6 +563,7 @@ function init() {
   renderTabLabels();
   renderByoCard();
   renderReviewCard();
+  renderKitchenNote();
   applyCardUrls();
   renderPanel('food');
   renderPanel('drinks');
