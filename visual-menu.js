@@ -5,7 +5,8 @@
 // this file. MENU_DATA shape: { food: [section], drinks: [section] } where
 // section = { key, title: {<locale>: string}, items: [item] } and
 // item = { name, desc, tag: {<locale>: string}|null, img: url|null,
-//          pork: bool, porkOnRequest: bool, note: {<locale>: string}|null },
+//          pork: bool, porkOnRequest: bool, halalBeef: bool, halalChicken: bool,
+//          note: {<locale>: string}|null },
 // with one key per entry in SUPPORTED_LANGS below.
 
 const MENU = window.MENU_DATA || { food: [], drinks: [] };
@@ -149,6 +150,10 @@ const itemCard = (item, sectionKey) => {
   const tag  = item.tag ? pick(item.tag) : '';
   const porkTag = item.pork ? pickExact(LABELS.porkTag) : '';
   const porkNote = item.porkOnRequest && porkTag ? pickExact(LABELS.porkOnRequestNote) : '';
+  const halalTags = [
+    item.halalBeef ? pickExact(LABELS.halalBeefTag) : '',
+    item.halalChicken ? pickExact(LABELS.halalChickenTag) : '',
+  ].filter(Boolean);
   const note = pickExact(item.note);
   const safeName = name.replace(/"/g, '&quot;');
   const safeDesc = desc.replace(/"/g, '&quot;');
@@ -173,7 +178,8 @@ const itemCard = (item, sectionKey) => {
       <p class="item__desc">${desc}</p>
     </details>` : ''}
     ${tag ? `<div class="item__tag">${tag}</div>` : ''}
-    ${porkTag ? `<div class="item__tag">${porkTag}</div>` : ''}
+    ${porkTag ? `<div class="item__tag item__tag--diet">${porkTag}</div>` : ''}
+    ${halalTags.map(t => `<div class="item__tag item__tag--diet">${t}</div>`).join('')}
     ${porkNote ? `<p class="item__desc">${porkNote}</p>` : ''}
     ${note ? `<p class="item__desc">${note}</p>` : ''}
   </article>`;

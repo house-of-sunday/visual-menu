@@ -327,6 +327,16 @@
     font-weight: 600;
   }
 
+  /* Dietary tags (pork, halal-certified meat) are information, not
+     decoration: always the plain accent label that ru/CJK tags already get,
+     never the script face, so they stay legible in every language. */
+  .item__tag--diet {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;                  /* .item__tag is 1: wrapped tags collide */
+  }
+
   /* ----- Arabic (RTL) ----- */
   /* dir="rtl" on <html> (set by syncDocumentLang) mirrors the flex/grid rows,
      the chip strip and text alignment on its own; the rules below cover what

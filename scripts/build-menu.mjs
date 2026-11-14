@@ -45,11 +45,11 @@ const urlFor = (source) => imageUrlBuilder(client).image(source)
 const QUERY = `*[_type == "visualMenuSection"] | order(displayOrder asc){
   _id, key, tab, title, displayOrder,
   "items": *[_type == "visualMenuItem" && references(^._id)] | order(displayOrder asc){
-    _id, name, description, tag, containsPork, porkOnRequest, note, displayOrder, image
+    _id, name, description, tag, containsPork, porkOnRequest, halalBeef, halalChicken, note, displayOrder, image
   }
 }`
 
-const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount, byoTitle, byoSupport, byoCta, byoUrl, reviewTitle, reviewSupport, reviewCta, reviewUrl, porkTag, porkOnRequestNote, kitchenNote}`
+const LABELS_QUERY = `*[_id == "visualMenuUiLabels"][0]{foodTab, drinksTab, ingredients, itemsCount, byoTitle, byoSupport, byoCta, byoUrl, reviewTitle, reviewSupport, reviewCta, reviewUrl, porkTag, porkOnRequestNote, halalBeefTag, halalChickenTag, kitchenNote}`
 
 // Adding a language = add its code here (and to the schema + front-end LOCALES).
 const LOCALES = ['en', 'zh', 'ru', 'id', 'ja', 'ko', 'ar']
@@ -86,6 +86,8 @@ const DEFAULT_LABELS = {
   // shows the note only once its text is filled in Studio.
   porkTag: {},
   porkOnRequestNote: {},
+  halalBeefTag: {},
+  halalChickenTag: {},
   kitchenNote: {},
 }
 
@@ -129,6 +131,8 @@ async function main() {
     // porkOnRequestNote labels, so each language switches on separately.
     pork: Boolean(item.containsPork),
     porkOnRequest: Boolean(item.containsPork && item.porkOnRequest),
+    halalBeef: Boolean(item.halalBeef),
+    halalChicken: Boolean(item.halalChicken),
     note: item.note ? shapeLocale(item.note) : null,
     img: item.image
       ? urlFor(item.image).width(800).fit('max').auto('format').quality(80).url()
